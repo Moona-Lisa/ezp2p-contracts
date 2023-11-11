@@ -1,0 +1,31 @@
+{
+  "name": "ezp2p-contracts",
+  "version": "1.0.0",
+  "description": "**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib",
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Moona-Lisa/ezp2p-contracts.git"
+  },
+  "author": "SamixDev",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Moona-Lisa/ezp2p-contracts/issues"
+  },
+  "homepage": "https://github.com/Moona-Lisa/ezp2p-contracts#readme",
+  "devDependencies": {
+    "hardhat": "^2.19.0",
+    "hardhat-preprocessor": "^0.1.5"
+  },
+  "dependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^3.0.0",
+    "dotenv": "^16.3.1"
+  }
+}
