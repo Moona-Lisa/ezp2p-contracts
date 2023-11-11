@@ -12,8 +12,7 @@ library Events {
         string name,
         address tokenAddress,
         bool isAllowed,
-        string symbol,
-        string chainId
+        string symbol
     );
 
     event AllowToken(address tokenAddress, bool status);

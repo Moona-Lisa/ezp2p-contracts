@@ -17,14 +17,12 @@ interface IOptions {
      * @param tokenAddress The address of the token.
      * @param isAllowed Whether the token is allowed or not.
      * @param symbol The symbol of the token.
-     * @param chainId The chainId of the token.
      */
     function addToken(
         string memory name,
         address tokenAddress,
         bool isAllowed,
         string memory symbol,
-        string memory chainId,
         uint256 decimals
     ) external;
 

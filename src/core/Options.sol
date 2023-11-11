@@ -7,7 +7,7 @@ import {IOptions} from "../interfaces/IOptions.sol";
 import {DataTypes} from "../utils/DataTypes.sol";
 import {Events} from "../utils/Events.sol";
 import {Duration} from "../utils/Duration.sol";
-import "solmate/tokens/ERC20.sol";
+import {ERC20} from "../utils/ERC20.sol";
 
 /**
  * @title Options
@@ -33,7 +33,6 @@ contract Options is Owner, OptionsStorage, IOptions {
         address tokenAddress,
         bool isAllowed,
         string memory symbol,
-        string memory chainId,
         uint256 decimals
     ) public onlyOwner {
         tokensMap[tokenAddress] = token(
@@ -41,11 +40,10 @@ contract Options is Owner, OptionsStorage, IOptions {
             tokenAddress,
             isAllowed,
             symbol,
-            chainId,
             decimals
         );
 
-        emit Events.AddToken(name, tokenAddress, isAllowed, symbol, chainId);
+        emit Events.AddToken(name, tokenAddress, isAllowed, symbol);
     }
 
     /// @inheritdoc IOptions
@@ -132,7 +130,6 @@ contract Options is Owner, OptionsStorage, IOptions {
             true, //iscall TODO: check on price and strike price
             offerExpiryTime,
             exerciseTime,
-            false,
             false
         );
 

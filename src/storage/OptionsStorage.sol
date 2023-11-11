@@ -16,7 +16,6 @@ abstract contract OptionsStorage {
         bool isCall;
         uint256 offerExpiryTime;
         uint256 exerciseStartTime;
-        bool isBought;
         bool isClaimed;
     }
 
@@ -25,7 +24,6 @@ abstract contract OptionsStorage {
         address tokenAddress;
         bool isAllowed;
         string symbol;
-        string chainId;
         uint256 decimals;
     }
 
