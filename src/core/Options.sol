@@ -105,6 +105,12 @@ contract Options is Owner, OptionsStorage, IOptions {
             "OFFER EXPIRY TIME MUST BE BEFORE EXERCISE TIME"
         );
 
+        // Approve the transfer of asset1
+        require(
+            ERC20(params.asset1).approve(address(this), params.amount),
+            "ASSET1 APPROVAL FAILED"
+        );
+
         require(
             ERC20(params.asset1).transferFrom(
                 msg.sender,
@@ -121,12 +127,13 @@ contract Options is Owner, OptionsStorage, IOptions {
             endTime,
             params.strikePrice,
             params.amount,
-            params.amount,
             params.asset1,
             params.asset2,
             true, //iscall TODO: check on price and strike price
             offerExpiryTime,
-            exerciseTime
+            exerciseTime,
+            false,
+            false
         );
 
         totalOptions++;

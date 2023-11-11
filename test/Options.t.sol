@@ -128,12 +128,14 @@ contract OptionsTest is Test {
         options.addToken("test", address(0x002), true, "test", "test", 18);
         vm.warp(1620000000);
 
-        console2.log("here");
         token.mint(address(alice), 1e18);
         console2.log(token.balanceOf(address(alice)));
-        // token.approve(address(options), 1e18);
         vm.prank(alice);
-        //options.createOption{value: 5000}(params);
-        // console2.log(_weth.balanceOf(alice));
+        token.approve(address(options), 5000);
+        vm.prank(alice);
+        //console2.log(options.totalOptions);
+        options.createOption(params);
+        console2.log(token.balanceOf(address(alice)));
+        //console2.log(options.totalOptions);
     }
 }

@@ -11,12 +11,13 @@ abstract contract OptionsStorage {
         uint256 endTime;
         uint256 strikePrice;
         uint256 totalAmount;
-        uint256 remainingAmount;
         address asset1;
         address asset2;
         bool isCall;
         uint256 offerExpiryTime;
         uint256 exerciseStartTime;
+        bool isBought;
+        bool isClaimed;
     }
 
     struct token {
