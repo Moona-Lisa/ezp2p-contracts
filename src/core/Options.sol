@@ -101,10 +101,10 @@ contract Options is Owner, OptionsStorage, IOptions {
             "OFFER EXPIRY TIME MUST BE BEFORE EXERCISE TIME"
         );
 
-        // Approve the transfer of asset1
         require(
-            ERC20(params.asset1).approve(address(this), params.amount),
-            "ASSET1 APPROVAL FAILED"
+            ERC20(params.asset1).allowance(msg.sender, address(this)) >=
+                params.amount,
+            "INSUFFICIENT TOKEN ALLOWANCE"
         );
 
         require(
