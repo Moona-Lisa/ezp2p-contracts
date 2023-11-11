@@ -39,7 +39,5 @@ interface IOptions {
      *
      * @param params The parameters of the option.
      */
-    function createOption(
-        DataTypes.CreateOptionParams memory params
-    ) external payable;
+    function createOption(DataTypes.CreateOptionParams memory params) external;
 }

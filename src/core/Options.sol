@@ -61,9 +61,7 @@ contract Options is Owner, OptionsStorage, IOptions {
     }
 
     /// @inheritdoc IOptions
-    function createOption(
-        DataTypes.CreateOptionParams memory params
-    ) public payable {
+    function createOption(DataTypes.CreateOptionParams memory params) public {
         require(
             tokensMap[params.asset1].tokenAddress != address(0),
             "ASSET1 NOT FOUND"
