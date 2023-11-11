@@ -4,7 +4,7 @@ pragma solidity ^0.8.13;
 import {Test, console2} from "forge-std/Test.sol";
 import {Options} from "../src/core/Options.sol";
 import {DataTypes} from "../src/utils/DataTypes.sol";
-import {ERC20} from "../src/utils/ERC20.sol";
+import {ERC20} from "../src/lib/ERC20.sol";
 import {MockERC20} from "./MockERC20.sol";
 
 contract OptionsTest is Test {
@@ -27,7 +27,8 @@ contract OptionsTest is Test {
             address(0x001),
             address(0x002),
             0,
-            0
+            0,
+            true
         );
     }
 

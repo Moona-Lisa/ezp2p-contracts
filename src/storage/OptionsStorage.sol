@@ -16,7 +16,6 @@ abstract contract OptionsStorage {
         bool isCall;
         uint256 offerExpiryTime;
         uint256 exerciseStartTime;
-        bool isClaimed;
     }
 
     struct token {
@@ -27,6 +26,7 @@ abstract contract OptionsStorage {
         uint256 decimals;
     }
 
+    mapping(uint256 => bool) public claimMap;
     mapping(uint256 => option) public optionsMap;
     mapping(address => token) public tokensMap;
 }

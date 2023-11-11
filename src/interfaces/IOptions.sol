@@ -35,6 +35,19 @@ interface IOptions {
     function allowToken(address tokenAddress, bool status) external;
 
     /**
+     * @notice Checks if the option can be created.
+     *
+     * @param params The parameters of the option.
+     *
+     * @return endTime The end time of the option.
+     * @return offerExpiryTime The offer expiry time of the option.
+     * @return exerciseTime The exercise time of the option.
+     */
+    function checkCreateOption(
+        DataTypes.CreateOptionParams memory params
+    ) external returns (uint256, uint256, uint256);
+
+    /**
      * @notice Creates an option.
      *
      * @param params The parameters of the option.

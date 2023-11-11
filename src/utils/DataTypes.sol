@@ -11,5 +11,6 @@ library DataTypes {
         address asset2;
         uint256 offerExpiryAfterHours;
         uint256 exerciseTimeInHours;
+        bool isCall;
     }
 }

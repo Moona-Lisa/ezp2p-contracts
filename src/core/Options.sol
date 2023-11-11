@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.13;
 
-import {Owner} from "../utils/Owner.sol";
+import {Owned} from "../lib/Owned.sol";
 import {OptionsStorage} from "../storage/OptionsStorage.sol";
 import {IOptions} from "../interfaces/IOptions.sol";
 import {DataTypes} from "../utils/DataTypes.sol";
 import {Events} from "../utils/Events.sol";
 import {Duration} from "../utils/Duration.sol";
-import {ERC20} from "../utils/ERC20.sol";
+import {ERC20} from "../lib/ERC20.sol";
 
 /**
  * @title Options
@@ -15,7 +15,7 @@ import {ERC20} from "../utils/ERC20.sol";
  *
  * @notice This is the main entrypoint of the Options contract.
  */
-contract Options is Owner, OptionsStorage, IOptions {
+contract Options is Owned, OptionsStorage, IOptions {
     /*//////////////////////////////////////////////////////////////
                                  CONSTRUCTOR
     //////////////////////////////////////////////////////////////*/
@@ -62,6 +62,62 @@ contract Options is Owner, OptionsStorage, IOptions {
 
     /// @inheritdoc IOptions
     function createOption(DataTypes.CreateOptionParams memory params) public {
+        (
+            uint256 endTime,
+            uint256 offerExpiryTime,
+            uint256 exerciseTime
+        ) = checkCreateOption(params);
+
+        require(
+            ERC20(params.asset1).transferFrom(
+                msg.sender,
+                address(this),
+                params.amount
+            ),
+            "ASSET1 TRANSFER FAILED"
+        );
+
+        option memory newOption = option(
+            msg.sender,
+            params.symbol,
+            block.timestamp,
+            endTime,
+            params.strikePrice,
+            params.amount,
+            params.asset1,
+            params.asset2,
+            params.isCall,
+            offerExpiryTime,
+            exerciseTime
+        );
+
+        totalOptions++;
+        optionsMap[totalOptions] = newOption;
+
+        emit Events.OptionCreated(
+            totalOptions,
+            msg.sender,
+            params.symbol,
+            block.timestamp,
+            endTime,
+            params.strikePrice,
+            params.amount,
+            params.asset1,
+            params.asset2,
+            params.isCall,
+            offerExpiryTime,
+            exerciseTime
+        );
+    }
+
+    /*//////////////////////////////////////////////////////////////
+                              PUBLIC VIEW
+    //////////////////////////////////////////////////////////////*/
+
+    /// @inheritdoc IOptions
+    function checkCreateOption(
+        DataTypes.CreateOptionParams memory params
+    ) public view returns (uint256, uint256, uint256) {
         require(
             tokensMap[params.asset1].tokenAddress != address(0),
             "ASSET1 NOT FOUND"
@@ -108,45 +164,10 @@ contract Options is Owner, OptionsStorage, IOptions {
         );
 
         require(
-            ERC20(params.asset1).transferFrom(
-                msg.sender,
-                address(this),
-                params.amount
-            ),
-            "ASSET1 TRANSFER FAILED"
+            ERC20(params.asset1).balanceOf(msg.sender) >= params.amount,
+            "INSUFFICIENT TOKEN BALANCE"
         );
 
-        option memory newOption = option(
-            msg.sender,
-            params.symbol,
-            block.timestamp,
-            endTime,
-            params.strikePrice,
-            params.amount,
-            params.asset1,
-            params.asset2,
-            true, //iscall TODO: check on price and strike price
-            offerExpiryTime,
-            exerciseTime,
-            false
-        );
-
-        totalOptions++;
-        optionsMap[totalOptions] = newOption;
-
-        emit Events.OptionCreated(
-            totalOptions,
-            msg.sender,
-            params.symbol,
-            block.timestamp,
-            endTime,
-            params.strikePrice,
-            params.amount,
-            params.asset1,
-            params.asset2,
-            true, //iscall TODO: check on price and strike price
-            offerExpiryTime,
-            exerciseTime
-        );
+        return (endTime, offerExpiryTime, exerciseTime);
     }
 }
