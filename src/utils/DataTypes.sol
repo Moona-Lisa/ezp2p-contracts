@@ -21,5 +21,6 @@ library DataTypes {
         bool isAllowed;
         string symbol;
         uint256 decimals;
+        address priceFeedAddress;
     }
 }

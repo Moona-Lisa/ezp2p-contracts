@@ -6,6 +6,7 @@ import {DataTypes} from "../utils/DataTypes.sol";
 import {Auth} from "../lib/Auth.sol";
 import {ITokens} from "../interfaces/ITokens.sol";
 import {TokensStorage} from "../storage/TokensStorage.sol";
+import {AggregatorV3Interface} from "../lib/AggregatorV3Interface.sol";
 
 /**
  * @title Tokens
@@ -25,7 +26,8 @@ abstract contract Tokens is Auth, ITokens, TokensStorage {
             params.symbol,
             params.decimals,
             0,
-            0
+            0,
+            params.priceFeedAddress
         );
 
         emit Events.AddToken(
@@ -52,16 +54,25 @@ abstract contract Tokens is Auth, ITokens, TokensStorage {
 
     /// @inheritdoc ITokens
     function updateTokenPrice(
-        address tokenAddress,
-        uint256 currentPrice
-    ) public onlyUpdater {
+        address tokenAddress
+    )
+        public
+        //    uint256 currentPrice
+        onlyUpdater
+    {
         require(
             tokensMap[tokenAddress].tokenAddress != address(0),
             "TOKEN NOT FOUND"
         );
-        tokensMap[tokenAddress].currentPrice = currentPrice;
+        dataFeed = AggregatorV3Interface(
+            tokensMap[tokenAddress].priceFeedAddress
+        );
 
-        emit Events.TokenPriceUpdated(tokenAddress, currentPrice);
+        (, int256 price, , , ) = dataFeed.latestRoundData();
+
+        tokensMap[tokenAddress].currentPrice = uint256(price);
+
+        emit Events.TokenPriceUpdated(tokenAddress, uint256(price));
     }
 
     /// @inheritdoc ITokens
