@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.13;
 
-import {Owned} from "../lib/Owned.sol";
 import {OptionsStorage} from "../storage/OptionsStorage.sol";
 import {IOptions} from "../interfaces/IOptions.sol";
+import {Tokens} from "../utils/Tokens.sol";
 import {DataTypes} from "../utils/DataTypes.sol";
 import {Events} from "../utils/Events.sol";
 import {Duration} from "../utils/Duration.sol";
@@ -15,7 +15,7 @@ import {ERC20} from "../lib/ERC20.sol";
  *
  * @notice This is the main entrypoint of the Options contract.
  */
-contract Options is Owned, OptionsStorage, IOptions {
+contract Options is OptionsStorage, IOptions, Tokens {
     /*//////////////////////////////////////////////////////////////
                                  CONSTRUCTOR
     //////////////////////////////////////////////////////////////*/
@@ -27,37 +27,23 @@ contract Options is Owned, OptionsStorage, IOptions {
     /*//////////////////////////////////////////////////////////////
                                  PUBLIC
     //////////////////////////////////////////////////////////////*/
-    /// @inheritdoc IOptions
-    function addToken(
-        string memory name,
-        address tokenAddress,
-        bool isAllowed,
-        string memory symbol,
-        uint256 decimals
-    ) public onlyOwner {
-        tokensMap[tokenAddress] = token(
-            name,
-            tokenAddress,
-            isAllowed,
-            symbol,
-            decimals
-        );
-
-        emit Events.AddToken(name, tokenAddress, isAllowed, symbol);
-    }
 
     /// @inheritdoc IOptions
-    function allowToken(address tokenAddress, bool status) public onlyOwner {
+    function buyOption(uint256 optionId) public {
+        require(msg.sender != address(0), "INVALID ADDRESS");
+        option memory optionToBuy = optionsMap[optionId];
+        require(optionToBuy.creator != address(0), "OPTION NOT FOUND");
+        require(optionToBuy.offerExpiryTime > block.timestamp, "OFFER EXPIRED");
         require(
-            tokensMap[tokenAddress].tokenAddress != address(0),
-            "TOKEN NOT FOUND"
+            buyersMap[optionId].buyerAddress == address(0),
+            "ALREADY BOUGHT"
         );
-        if (tokensMap[tokenAddress].isAllowed == status) {
-            return;
-        }
-        tokensMap[tokenAddress].isAllowed = status;
 
-        emit Events.AllowToken(tokenAddress, status);
+        //  TODO: transfer premium to the creator
+
+        buyersMap[optionId] = buyer(msg.sender, false);
+
+        emit Events.OptionBought(optionId, msg.sender);
     }
 
     /// @inheritdoc IOptions
@@ -67,7 +53,6 @@ contract Options is Owned, OptionsStorage, IOptions {
             uint256 offerExpiryTime,
             uint256 exerciseTime
         ) = checkCreateOption(params);
-
         require(
             ERC20(params.asset1).transferFrom(
                 msg.sender,
@@ -80,10 +65,10 @@ contract Options is Owned, OptionsStorage, IOptions {
         option memory newOption = option(
             msg.sender,
             params.symbol,
-            block.timestamp,
             endTime,
             params.strikePrice,
             params.amount,
+            params.premiumPrice,
             params.asset1,
             params.asset2,
             params.isCall,
@@ -98,10 +83,10 @@ contract Options is Owned, OptionsStorage, IOptions {
             totalOptions,
             msg.sender,
             params.symbol,
-            block.timestamp,
             endTime,
             params.strikePrice,
             params.amount,
+            params.premiumPrice,
             params.asset1,
             params.asset2,
             params.isCall,
@@ -167,6 +152,8 @@ contract Options is Owned, OptionsStorage, IOptions {
             ERC20(params.asset1).balanceOf(msg.sender) >= params.amount,
             "INSUFFICIENT TOKEN BALANCE"
         );
+
+        // TODO : check premium price
 
         return (endTime, offerExpiryTime, exerciseTime);
     }

@@ -15,11 +15,22 @@ async function main() {
 
   console.log("Options contract deployed to:", await optionsInstance.getAddress());
 
+  let updaters = [process.env.UPDATER_ADDRESS1, process.env.UPDATER_ADDRESS2]
+
+  //   string name;
+  // address tokenAddress;
+  // bool isAllowed;
+  // string symbol;
+  // uint256 decimals;
+
+
   // add some tokens to the contract
-  await new Promise(r => setTimeout(r, 5000));
-  await optionsInstance.addToken("Link", "0x326c977e6efc84e512bb9c30f76e30c160ed06fb", true, "LINK", 18);
-  await new Promise(r => setTimeout(r, 5000));
-  await optionsInstance.addToken("Usdc", "0xe6b8a5CF854791412c1f6EFC7CAf629f5Df1c747", true, "USDC", 18);
+  await new Promise(r => setTimeout(r, 2000));
+  await optionsInstance.setUpdater(updaters);
+  await new Promise(r => setTimeout(r, 2000));
+  await optionsInstance.addToken({ name: "Link", tokenAddress: "0x326c977e6efc84e512bb9c30f76e30c160ed06fb", isAllowed: true, symbol: "LINK", decimals: 18 });
+  await new Promise(r => setTimeout(r, 2000));
+  await optionsInstance.addToken({ name: "Usdc", tokenAddress: "0xe6b8a5CF854791412c1f6EFC7CAf629f5Df1c747", isAllowed: true, symbol: "USDC", decimals: 18 });
 
   console.log("Token added successfully.");
 }
