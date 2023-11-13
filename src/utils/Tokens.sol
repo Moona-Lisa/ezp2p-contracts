@@ -22,7 +22,7 @@ abstract contract Tokens is Auth, ITokens, TokensStorage {
     /// @inheritdoc ITokens
     function addToken(
         DataTypes.CreateTokenParams memory params
-    ) public onlyOwner {
+    ) public virtual onlyOwner {
         dataFeed = AggregatorV3Interface(params.priceFeedAddress);
 
         (, int price, , , ) = dataFeed.latestRoundData();

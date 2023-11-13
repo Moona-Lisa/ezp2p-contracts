@@ -2,13 +2,13 @@
 pragma solidity ^0.8.13;
 
 import {Test, console2} from "forge-std/Test.sol";
-import {Options} from "../src/core/Options.sol";
+import {MockOptions} from "./MockOptions.sol";
 import {DataTypes} from "../src/utils/DataTypes.sol";
 import {ERC20} from "../src/lib/ERC20.sol";
 import {MockERC20} from "./MockERC20.sol";
 
 contract TokensTest is Test {
-    Options public options;
+    MockOptions public options;
     MockERC20 public token;
 
     // address public immutable owner;
@@ -21,7 +21,7 @@ contract TokensTest is Test {
     address[2] updaters;
 
     function setUp() public {
-        options = new Options();
+        options = new MockOptions();
         token = new MockERC20("Token", "TKN", 18);
 
         testTokenParams1 = DataTypes.CreateTokenParams(
@@ -92,10 +92,7 @@ contract TokensTest is Test {
         vm.prank(alice);
         options.updateTokensPrice();
 
-        options.setUpdater(updaters);
-        vm.prank(alice);
-        options.updateTokensPrice();
-
+        vm.expectRevert("UNAUTHORIZED UPDATER");
         vm.prank(bob);
         options.updateTokenVolatility(address(0x1351), 100);
     }
