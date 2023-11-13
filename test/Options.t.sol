@@ -40,14 +40,16 @@ contract OptionsTest is Test {
             address(0x1351),
             true,
             "test",
-            18
+            18,
+            address(0x1351)
         );
         testTokenParams2 = DataTypes.CreateTokenParams(
             "Token",
             address(token),
             true,
             "TKN",
-            18
+            18,
+            address(0x1351)
         );
     }
 

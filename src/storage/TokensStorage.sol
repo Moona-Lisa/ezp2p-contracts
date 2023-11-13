@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.13;
 
-import "../../lib/chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
+import {AggregatorV3Interface} from "../lib/AggregatorV3Interface.sol";
 
 abstract contract TokensStorage {
     AggregatorV3Interface internal dataFeed;
@@ -18,4 +18,5 @@ abstract contract TokensStorage {
     }
 
     mapping(address => token) public tokensMap;
+    address[] public tokensArr;
 }

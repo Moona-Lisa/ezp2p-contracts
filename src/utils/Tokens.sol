@@ -15,20 +15,30 @@ import {AggregatorV3Interface} from "../lib/AggregatorV3Interface.sol";
  * @notice This is the main entrypoint of the Tokens contract.
  */
 abstract contract Tokens is Auth, ITokens, TokensStorage {
+    /*//////////////////////////////////////////////////////////////
+                                 PUBLIC
+    //////////////////////////////////////////////////////////////*/
+
     /// @inheritdoc ITokens
     function addToken(
         DataTypes.CreateTokenParams memory params
     ) public onlyOwner {
+        dataFeed = AggregatorV3Interface(params.priceFeedAddress);
+
+        (, int price, , , ) = dataFeed.latestRoundData();
+
         tokensMap[params.tokenAddress] = token(
             params.name,
             params.tokenAddress,
             params.isAllowed,
             params.symbol,
             params.decimals,
-            0,
+            uint256(price),
             0,
             params.priceFeedAddress
         );
+
+        tokensArr.push(params.tokenAddress);
 
         emit Events.AddToken(
             params.name,
@@ -53,26 +63,18 @@ abstract contract Tokens is Auth, ITokens, TokensStorage {
     }
 
     /// @inheritdoc ITokens
-    function updateTokenPrice(
-        address tokenAddress
-    )
-        public
-        //    uint256 currentPrice
-        onlyUpdater
-    {
-        require(
-            tokensMap[tokenAddress].tokenAddress != address(0),
-            "TOKEN NOT FOUND"
-        );
-        dataFeed = AggregatorV3Interface(
-            tokensMap[tokenAddress].priceFeedAddress
-        );
+    function updateTokensPrice() public onlyUpdater {
+        for (uint i = 0; i < tokensArr.length; i++) {
+            address tokenAddress = tokensArr[i];
+            dataFeed = AggregatorV3Interface(
+                tokensMap[tokenAddress].priceFeedAddress
+            );
 
-        (, int256 price, , , ) = dataFeed.latestRoundData();
+            (, int price, , , ) = dataFeed.latestRoundData();
 
-        tokensMap[tokenAddress].currentPrice = uint256(price);
-
-        emit Events.TokenPriceUpdated(tokenAddress, uint256(price));
+            tokensMap[tokenAddress].currentPrice = uint256(price);
+            emit Events.TokenPriceUpdated(tokenAddress, uint256(price));
+        }
     }
 
     /// @inheritdoc ITokens

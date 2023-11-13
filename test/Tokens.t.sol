@@ -29,14 +29,16 @@ contract TokensTest is Test {
             address(0x1351),
             true,
             "test",
-            18
+            18,
+            address(0x1351)
         );
         testTokenParams2 = DataTypes.CreateTokenParams(
             "Token",
             address(token),
             true,
             "TKN",
-            18
+            18,
+            address(0x1351)
         );
 
         updaters = [address(alice), address(bob)];
@@ -88,11 +90,11 @@ contract TokensTest is Test {
 
         vm.expectRevert("UNAUTHORIZED UPDATER");
         vm.prank(alice);
-        options.updateTokenPrice(address(0x1351), 100);
+        options.updateTokensPrice();
 
         options.setUpdater(updaters);
         vm.prank(alice);
-        options.updateTokenPrice(address(0x1351), 100);
+        options.updateTokensPrice();
 
         vm.prank(bob);
         options.updateTokenVolatility(address(0x1351), 100);

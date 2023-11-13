@@ -28,9 +28,8 @@ interface ITokens {
     /**
      * @notice Updates the price of a token.
      *
-     * @param tokenAddress The address of the token.
      */
-    function updateTokenPrice(address tokenAddress) external;
+    function updateTokensPrice() external;
 
     /**
      * @notice Updates the annualized volatility of a token.
