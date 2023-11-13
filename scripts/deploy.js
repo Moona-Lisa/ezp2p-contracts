@@ -25,12 +25,18 @@ async function main() {
 
 
   // add some tokens to the contract
-  await new Promise(r => setTimeout(r, 2000));
+  await new Promise(r => setTimeout(r, 5000));
   await optionsInstance.setUpdater(updaters);
-  await new Promise(r => setTimeout(r, 2000));
-  await optionsInstance.addToken({ name: "Link", tokenAddress: "0x326c977e6efc84e512bb9c30f76e30c160ed06fb", isAllowed: true, symbol: "LINK", decimals: 18 });
-  await new Promise(r => setTimeout(r, 2000));
-  await optionsInstance.addToken({ name: "Usdc", tokenAddress: "0xe6b8a5CF854791412c1f6EFC7CAf629f5Df1c747", isAllowed: true, symbol: "USDC", decimals: 18 });
+  await new Promise(r => setTimeout(r, 5000));
+  await optionsInstance.addToken({
+    name: "Link", tokenAddress: "0x326c977e6efc84e512bb9c30f76e30c160ed06fb", isAllowed: true, symbol: "LINK", decimals: 18,
+    priceFeedAddress: "0xd9ffdb71ebe7496cc440152d43986aae0ab76665"
+  });
+  await new Promise(r => setTimeout(r, 5000));
+  await optionsInstance.addToken({
+    name: "Usdc", tokenAddress: "0xe6b8a5CF854791412c1f6EFC7CAf629f5Df1c747", isAllowed: true, symbol: "USDC", decimals: 18,
+    priceFeedAddress: "0xfe4a8cc5b5b2366c1b58bea3858e81843581b2f7"
+  });
 
   console.log("Token added successfully.");
 }
