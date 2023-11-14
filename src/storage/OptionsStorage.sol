@@ -4,7 +4,7 @@ pragma solidity ^0.8.13;
 abstract contract OptionsStorage {
     uint256 public totalOptions;
 
-    struct option {
+    struct Option {
         address creator;
         string symbol;
         uint256 endTime;
@@ -18,13 +18,13 @@ abstract contract OptionsStorage {
         uint256 exerciseStartTime;
     }
 
-    struct buyer {
+    struct Buyer {
         address buyerAddress;
         bool hasExercised;
     }
 
     mapping(uint256 => bool) public claimMap;
-    mapping(uint256 => option) public optionsMap;
+    mapping(uint256 => Option) public optionsMap;
 
-    mapping(uint256 => buyer) public buyersMap;
+    mapping(uint256 => Buyer) public buyersMap;
 }

@@ -6,7 +6,7 @@ import {AggregatorV3Interface} from "../lib/AggregatorV3Interface.sol";
 abstract contract TokensStorage {
     AggregatorV3Interface internal dataFeed;
 
-    struct token {
+    struct Token {
         string name;
         address tokenAddress;
         bool isAllowed;
@@ -17,6 +17,6 @@ abstract contract TokensStorage {
         address priceFeedAddress;
     }
 
-    mapping(address => token) public tokensMap;
+    mapping(address => Token) public tokensMap;
     address[] public tokensArr;
 }
