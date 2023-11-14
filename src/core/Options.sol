@@ -28,10 +28,47 @@ contract Options is OptionsStorage, IOptions, Tokens {
                                  PUBLIC
     //////////////////////////////////////////////////////////////*/
 
+    function exerciseOption(uint256 optionId) public {
+        require(msg.sender != address(0), "INVALID ADDRESS");
+        Option memory optionToExercise = optionsMap[optionId];
+        require(optionToExercise.creator != address(0), "OPTION NOT FOUND");
+        Buyer memory buyer = buyersMap[optionId];
+        require(!buyer.hasExercised, "ALREADY EXERCISED");
+        require(
+            buyersMap[optionId].buyerAddress != address(0),
+            "NOT BOUGHT YET"
+        );
+        require(
+            block.timestamp > optionToExercise.exerciseStartTime,
+            "NOT EXERCISABLE"
+        );
+        require(block.timestamp < optionToExercise.endTime, "HAS EXPIRED");
+        require(buyer.buyerAddress == msg.sender, "NOT YOUR OPTION");
+
+        // TODO: transfer the asset2 to the contract and the asset1 to the buyer
+        // require(
+        //     ERC20(optionToExercise.asset2).transfer(
+        //         address(this),
+        //         optionToExercise.totalAmount
+        //     ),
+        //     "ASSET2 TRANSFER FAILED"
+        // );
+        // require(
+        //     ERC20(optionToExercise.asset1).transfer(
+        //         msg.sender,
+        //         optionToExercise.totalAmount
+        //     ),
+        //     "ASSET1 TRANSFER FAILED"
+        // );
+
+        buyersMap[optionId].hasExercised = true;
+        emit Events.OptionExercised(optionId, msg.sender);
+    }
+
     /// @inheritdoc IOptions
     function buyOption(uint256 optionId) public {
         require(msg.sender != address(0), "INVALID ADDRESS");
-        option memory optionToBuy = optionsMap[optionId];
+        Option memory optionToBuy = optionsMap[optionId];
         require(optionToBuy.creator != address(0), "OPTION NOT FOUND");
         require(optionToBuy.offerExpiryTime > block.timestamp, "OFFER EXPIRED");
         require(
@@ -41,7 +78,7 @@ contract Options is OptionsStorage, IOptions, Tokens {
 
         //  TODO: transfer premium to the creator
 
-        buyersMap[optionId] = buyer(msg.sender, false);
+        buyersMap[optionId] = Buyer(msg.sender, false);
 
         emit Events.OptionBought(optionId, msg.sender);
     }
@@ -62,7 +99,7 @@ contract Options is OptionsStorage, IOptions, Tokens {
             "ASSET1 TRANSFER FAILED"
         );
 
-        option memory newOption = option(
+        Option memory newOption = Option(
             msg.sender,
             params.symbol,
             endTime,
