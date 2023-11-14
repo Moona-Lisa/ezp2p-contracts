@@ -11,6 +11,13 @@ import {DataTypes} from "../utils/DataTypes.sol";
  */
 interface IOptions {
     /**
+     * @notice Exercies an option.
+     *
+     * @param optionId The id of the option.
+     */
+    function exerciseOption(uint256 optionId) external;
+
+    /**
      * @notice Checks if the option can be created.
      *
      * @param params The parameters of the option.

@@ -28,6 +28,7 @@ contract Options is OptionsStorage, IOptions, Tokens {
                                  PUBLIC
     //////////////////////////////////////////////////////////////*/
 
+    /// @inheritdoc IOptions
     function exerciseOption(uint256 optionId) public {
         require(msg.sender != address(0), "INVALID ADDRESS");
         Option memory optionToExercise = optionsMap[optionId];
