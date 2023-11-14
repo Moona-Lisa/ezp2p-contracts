@@ -158,4 +158,50 @@ contract OptionsTest is Test {
         vm.prank(bob);
         options.buyOption(1);
     }
+
+    /*//////////////////////////////////////////////////////////////
+                            TEST EXERCISE OPTION
+    //////////////////////////////////////////////////////////////*/
+
+    // test exerciseOption function
+    function test_exerciseOption() public {
+        vm.expectRevert("OPTION NOT FOUND");
+        vm.prank(alice);
+        options.exerciseOption(0);
+
+        optionSetup();
+
+        vm.expectRevert("NOT BOUGHT YET");
+        vm.prank(alice);
+        options.exerciseOption(1);
+
+        vm.prank(alice);
+        options.buyOption(1);
+
+        vm.expectRevert("INVALID ADDRESS");
+        vm.prank(address(0x0));
+        options.exerciseOption(1);
+
+        vm.warp(1620000000);
+        vm.expectRevert("NOT EXERCISABLE");
+        vm.prank(alice);
+        options.exerciseOption(1);
+
+        // options.Option memory optionToExercise = options.optionsMap[1];
+        vm.warp(1620000000 + 240 hours);
+        vm.expectRevert("HAS EXPIRED");
+        vm.prank(alice);
+        options.exerciseOption(1);
+
+        vm.warp(1620000000 + 77 hours);
+        vm.expectRevert("NOT YOUR OPTION");
+        vm.prank(bob);
+        options.exerciseOption(1);
+
+        vm.prank(alice);
+        options.exerciseOption(1);
+        vm.expectRevert("ALREADY EXERCISED");
+        vm.prank(alice);
+        options.exerciseOption(1);
+    }
 }

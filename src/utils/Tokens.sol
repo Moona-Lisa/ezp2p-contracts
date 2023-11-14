@@ -27,7 +27,7 @@ abstract contract Tokens is Auth, ITokens, TokensStorage {
 
         (, int price, , , ) = dataFeed.latestRoundData();
 
-        tokensMap[params.tokenAddress] = token(
+        tokensMap[params.tokenAddress] = Token(
             params.name,
             params.tokenAddress,
             params.isAllowed,

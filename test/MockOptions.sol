@@ -9,7 +9,7 @@ contract MockOptions is Options {
     function addToken(
         DataTypes.CreateTokenParams memory params
     ) public override onlyOwner {
-        tokensMap[params.tokenAddress] = token(
+        tokensMap[params.tokenAddress] = Token(
             params.name,
             params.tokenAddress,
             params.isAllowed,
