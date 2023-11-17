@@ -12,7 +12,8 @@ library Events {
         string name,
         address tokenAddress,
         bool isAllowed,
-        string symbol
+        string symbol,
+        bool isStable
     );
 
     event TokenPriceUpdated(address tokenAddress, uint256 currentPrice);

@@ -7,6 +7,7 @@ import {Auth} from "../lib/Auth.sol";
 import {ITokens} from "../interfaces/ITokens.sol";
 import {TokensStorage} from "../storage/TokensStorage.sol";
 import {AggregatorV3Interface} from "../lib/AggregatorV3Interface.sol";
+import {FunctionsConsumer} from "./FunctionsConsumer.sol";
 
 /**
  * @title Tokens
@@ -14,7 +15,7 @@ import {AggregatorV3Interface} from "../lib/AggregatorV3Interface.sol";
  *
  * @notice This is the main entrypoint of the Tokens contract.
  */
-abstract contract Tokens is Auth, ITokens, TokensStorage {
+abstract contract Tokens is Auth, ITokens, TokensStorage, FunctionsConsumer {
     /*//////////////////////////////////////////////////////////////
                                  PUBLIC
     //////////////////////////////////////////////////////////////*/
@@ -25,7 +26,12 @@ abstract contract Tokens is Auth, ITokens, TokensStorage {
     ) public virtual onlyOwner {
         dataFeed = AggregatorV3Interface(params.priceFeedAddress);
 
-        (, int price, , , ) = dataFeed.latestRoundData();
+        int price;
+        if (!params.isStable) {
+            price = 100000000;
+        } else {
+            (, price, , , ) = dataFeed.latestRoundData();
+        }
 
         tokensMap[params.tokenAddress] = Token(
             params.name,
@@ -35,7 +41,8 @@ abstract contract Tokens is Auth, ITokens, TokensStorage {
             params.decimals,
             uint256(price),
             0,
-            params.priceFeedAddress
+            params.priceFeedAddress,
+            params.isStable
         );
 
         tokensArr.push(params.tokenAddress);
@@ -44,7 +51,8 @@ abstract contract Tokens is Auth, ITokens, TokensStorage {
             params.name,
             params.tokenAddress,
             params.isAllowed,
-            params.symbol
+            params.symbol,
+            params.isStable
         );
     }
 
@@ -65,6 +73,9 @@ abstract contract Tokens is Auth, ITokens, TokensStorage {
     /// @inheritdoc ITokens
     function updateTokensPrice() public onlyUpdater {
         for (uint i = 0; i < tokensArr.length; i++) {
+            if (tokensMap[tokensArr[i]].isStable) {
+                continue;
+            }
             address tokenAddress = tokensArr[i];
             dataFeed = AggregatorV3Interface(
                 tokensMap[tokenAddress].priceFeedAddress
@@ -78,16 +89,17 @@ abstract contract Tokens is Auth, ITokens, TokensStorage {
     }
 
     /// @inheritdoc ITokens
-    function updateTokenVolatility(
-        address tokenAddress,
-        uint256 annualizedVolatility
-    ) public onlyUpdater {
-        require(
-            tokensMap[tokenAddress].tokenAddress != address(0),
-            "TOKEN NOT FOUND"
-        );
-        tokensMap[tokenAddress].annualizedVolatility = annualizedVolatility;
+    function updateTokensVolatility() public onlyUpdater {
+        for (uint i = 0; i < tokensArr.length; i++) {
+            if (tokensMap[tokensArr[i]].isStable) {
+                continue;
+            }
+            address tokenAddress = tokensArr[i];
 
-        emit Events.TokenVolatilityUpdated(tokenAddress, annualizedVolatility);
+            // TODO: Implement volatility calculation
+
+            //   tokensMap[tokenAddress].annualizedVolatility = uint256(volatility);
+            //   emit Events.TokenVolatilityUpdated(tokenAddress, uint256(volatility));
+        }
     }
 }

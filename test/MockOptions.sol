@@ -17,7 +17,8 @@ contract MockOptions is Options {
             params.decimals,
             0,
             0,
-            params.priceFeedAddress
+            params.priceFeedAddress,
+            params.isStable
         );
 
         tokensArr.push(params.tokenAddress);
@@ -26,7 +27,8 @@ contract MockOptions is Options {
             params.name,
             params.tokenAddress,
             params.isAllowed,
-            params.symbol
+            params.symbol,
+            params.isStable
         );
     }
 }

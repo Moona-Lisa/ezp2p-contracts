@@ -146,6 +146,10 @@ contract Options is OptionsStorage, IOptions, Tokens {
             "ASSET1 NOT FOUND"
         );
         require(
+            !tokensMap[params.asset1].isStable,
+            "ASSET1 CAN NOT BE A STABLECOIN"
+        );
+        require(
             tokensMap[params.asset2].tokenAddress != address(0),
             "ASSET2 NOT FOUND"
         );

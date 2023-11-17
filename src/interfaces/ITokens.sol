@@ -34,11 +34,6 @@ interface ITokens {
     /**
      * @notice Updates the annualized volatility of a token.
      *
-     * @param tokenAddress The address of the token.
-     * @param annualizedVolatility The annualized volatility of the token.
      */
-    function updateTokenVolatility(
-        address tokenAddress,
-        uint256 annualizedVolatility
-    ) external;
+    function updateTokensVolatility() external;
 }

@@ -30,7 +30,8 @@ contract TokensTest is Test {
             true,
             "test",
             18,
-            address(0x1351)
+            address(0x1351),
+            false
         );
         testTokenParams2 = DataTypes.CreateTokenParams(
             "Token",
@@ -38,7 +39,8 @@ contract TokensTest is Test {
             true,
             "TKN",
             18,
-            address(0x1351)
+            address(0x1351),
+            false
         );
 
         updaters = [address(alice), address(bob)];
@@ -91,9 +93,5 @@ contract TokensTest is Test {
         vm.expectRevert("UNAUTHORIZED UPDATER");
         vm.prank(alice);
         options.updateTokensPrice();
-
-        vm.expectRevert("UNAUTHORIZED UPDATER");
-        vm.prank(bob);
-        options.updateTokenVolatility(address(0x1351), 100);
     }
 }

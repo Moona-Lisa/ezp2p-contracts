@@ -22,5 +22,6 @@ library DataTypes {
         string symbol;
         uint256 decimals;
         address priceFeedAddress;
+        bool isStable;
     }
 }
