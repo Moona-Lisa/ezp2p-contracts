@@ -2,16 +2,18 @@
 pragma solidity ^0.8.13;
 
 import {FunctionsClient} from "chainlink/contracts/src/v0.8/functions/dev/v1_0_0/FunctionsClient.sol";
-import {ConfirmedOwner} from "chainlink/contracts/src/v0.8/shared/access/ConfirmedOwner.sol";
 import {FunctionsRequest} from "chainlink/contracts/src/v0.8/functions/dev/v1_0_0/libraries/FunctionsRequest.sol";
 import {Auth} from "../lib/Auth.sol";
+import {TokensStorage} from "../storage/TokensStorage.sol";
+import {Utils} from "./Utils.sol";
+import {Events} from "./Events.sol";
 
 /**
  * @title FunctionsConsumer
  * @notice A contract that consumes requests from a Chainlink node
  * @dev This contract uses hardcoded values and should not be used in production.
  */
-contract FunctionsConsumer is FunctionsClient, Auth {
+contract FunctionsConsumer is FunctionsClient, Auth, TokensStorage {
     using FunctionsRequest for FunctionsRequest.Request;
 
     // State variables to store the last request ID, response, and error
@@ -29,21 +31,17 @@ contract FunctionsConsumer is FunctionsClient, Auth {
     address router = 0x6E2dc0F9DB014aE19888F539E59285D2Ea04244C;
 
     // JavaScript source code
-    // Fetch character name from the Star Wars API.
-    // Documentation: https://swapi.dev/documentation#people
     string source =
+        "const tokenAddr = args[0];"
         "const apiResponse = await Functions.makeHttpRequest({"
-        "url: `https://ezp2p.free.beeceptor.com/api/volatility`"
+        "url: `https://6555fbaf84b36e3a431ec3ed.mockapi.io/api/volatility/${tokenAddr}/`"
         "});"
         "if (apiResponse.error) {"
         "throw Error('Request failed');"
         "}"
         "const { data } = apiResponse;"
-        "let res = data.data"
-        "res.forEach((e) => {"
-        "e.volatility = e.volatility.toFixed(10) * (10**18);"
-        "});"
-        "return Functions.encodeString(JSON.stringify(res));";
+        "let res = data[0];"
+        "return Functions.encodeString(res);";
 
     //Callback gas limit
     uint32 gasLimit = 300000;
@@ -65,8 +63,8 @@ contract FunctionsConsumer is FunctionsClient, Auth {
      */
     function sendRequest(
         uint64 subscriptionId,
-        string[] calldata args
-    ) external onlyOwner returns (bytes32 requestId) {
+        string[] memory args
+    ) public onlyOwner returns (bytes32 requestId) {
         FunctionsRequest.Request memory req;
         req.initializeRequestForInlineJavaScript(source); // Initialize the request with JS code
         if (args.length > 0) req.setArgs(args); // Set the arguments for the request
@@ -99,6 +97,25 @@ contract FunctionsConsumer is FunctionsClient, Auth {
         // Update the contract's state variables with the response and any errors
         s_lastResponse = response;
         s_lastError = err;
+
+        if (response.length > 0) {
+            // Parse the response and update the tokensMap
+            address tokenAddr = Utils.str2addr(
+                Utils.substring(string(response), 2, 44)
+            );
+
+            uint256 volValue = Utils.str2num(
+                Utils.substring(string(response), 46, 50)
+            );
+
+            require(
+                tokensMap[tokenAddr].tokenAddress != address(0),
+                "TOKEN NOT FOUND"
+            );
+
+            tokensMap[tokenAddr].annualizedVolatility = volValue;
+            emit Events.TokenVolatilityUpdated(tokenAddr, volValue);
+        }
 
         // Emit an event to log the response
         emit Response(requestId, s_lastResponse, s_lastError);

@@ -32,7 +32,7 @@ interface ITokens {
     function updateTokensPrice() external;
 
     /**
-     * @notice Updates the annualized volatility of a token.
+     * @notice Updates the volatility of a token.
      *
      */
     function updateTokensVolatility() external;

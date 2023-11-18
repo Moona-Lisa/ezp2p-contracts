@@ -8,6 +8,7 @@ import {ITokens} from "../interfaces/ITokens.sol";
 import {TokensStorage} from "../storage/TokensStorage.sol";
 import {AggregatorV3Interface} from "../lib/AggregatorV3Interface.sol";
 import {FunctionsConsumer} from "./FunctionsConsumer.sol";
+import {Utils} from "../utils/Utils.sol";
 
 /**
  * @title Tokens
@@ -95,11 +96,9 @@ abstract contract Tokens is Auth, ITokens, TokensStorage, FunctionsConsumer {
                 continue;
             }
             address tokenAddress = tokensArr[i];
-
-            // TODO: Implement volatility calculation
-
-            //   tokensMap[tokenAddress].annualizedVolatility = uint256(volatility);
-            //   emit Events.TokenVolatilityUpdated(tokenAddress, uint256(volatility));
+            string[] memory strigifiedAddr;
+            strigifiedAddr[0] = Utils.addr2str(tokenAddress);
+            sendRequest(786, strigifiedAddr);
         }
     }
 }

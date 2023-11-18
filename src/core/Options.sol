@@ -6,7 +6,7 @@ import {IOptions} from "../interfaces/IOptions.sol";
 import {Tokens} from "../utils/Tokens.sol";
 import {DataTypes} from "../utils/DataTypes.sol";
 import {Events} from "../utils/Events.sol";
-import {Duration} from "../utils/Duration.sol";
+import {Utils} from "../utils/Utils.sol";
 import {ERC20} from "../lib/ERC20.sol";
 
 /**
@@ -166,15 +166,15 @@ contract Options is OptionsStorage, IOptions, Tokens {
             "EXERCISE TIME MUST BE POSITIVE"
         );
 
-        uint256 endTime = Duration.getDurationEndTimeForDays(
+        uint256 endTime = Utils.getDurationEndTimeForDays(
             block.timestamp,
             params.nbOfDays
         );
-        uint256 offerExpiryTime = Duration.getDurationEndTimeForHours(
+        uint256 offerExpiryTime = Utils.getDurationEndTimeForHours(
             block.timestamp,
             params.offerExpiryAfterHours
         );
-        uint256 exerciseTime = Duration.getDurationStartTimeForHours(
+        uint256 exerciseTime = Utils.getDurationStartTimeForHours(
             endTime,
             params.exerciseTimeInHours
         );

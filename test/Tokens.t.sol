@@ -94,4 +94,26 @@ contract TokensTest is Test {
         vm.prank(alice);
         options.updateTokensPrice();
     }
+
+    // test receive function response
+    function test_receive() public {
+        DataTypes.CreateTokenParams memory testTokenLink = DataTypes
+            .CreateTokenParams(
+                "chainlink",
+                address(0x326C977E6efc84E512bB9C30f76E30c160eD06FB),
+                true,
+                "LINK",
+                18,
+                address(0x1351),
+                false
+            );
+
+        options.addToken(testTokenLink);
+
+        string
+            memory str = '["0x326C977E6efc84E512bB9C30f76E30c160eD06FB",7069]';
+
+        bytes memory b = bytes(str);
+        options.fulfillRequestMock(b);
+    }
 }

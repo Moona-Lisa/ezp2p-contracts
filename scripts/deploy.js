@@ -22,7 +22,7 @@ async function main() {
   await optionsInstance.setUpdater(updaters);
   await new Promise(r => setTimeout(r, 5000));
   await optionsInstance.addToken({
-    name: "chainlink", tokenAddress: "0x326c977e6efc84e512bb9c30f76e30c160ed06fb", isAllowed: true, symbol: "LINK", decimals: 18,
+    name: "chainlink", tokenAddress: "0x326C977E6efc84E512bB9C30f76E30c160eD06FB", isAllowed: true, symbol: "LINK", decimals: 18,
     priceFeedAddress: "0x1C2252aeeD50e0c9B64bDfF2735Ee3C932F5C408", isStable: true
   });
   await new Promise(r => setTimeout(r, 5000));
