@@ -60,8 +60,9 @@ contract MockOptions is Options {
 
     function updateTokensVolatilityMock()
         public
+        view
         onlyUpdater
-        returns (uint64, string[] memory)
+        returns (uint64 x, string[] memory y)
     {
         for (uint i = 0; i < tokensArr.length; i++) {
             if (tokensMap[tokensArr[i]].isStable) {
@@ -77,18 +78,15 @@ contract MockOptions is Options {
             strigifiedAddr[0] = Utils.addr2str(tokenAddress);
 
             // Send the request with the stringified address
-            (uint64 t, string[] memory y) = sendRequestMock(
-                786,
-                strigifiedAddr
-            );
-            return (t, y);
+            (x, y) = sendRequestMock(786, strigifiedAddr);
+            return (x, y);
         }
     }
 
     function sendRequestMock(
         uint64 subscriptionId,
         string[] memory args
-    ) public onlyOwner returns (uint64, string[] memory) {
+    ) public view onlyOwner returns (uint64, string[] memory) {
         require(args.length > 0);
         return (subscriptionId, args);
     }
