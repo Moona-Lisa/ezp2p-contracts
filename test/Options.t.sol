@@ -237,11 +237,6 @@ contract OptionsTest is Test {
         vm.prank(alice);
         options.claimCollateral(1);
 
-        vm.warp(1620000000 + 25 hours);
-        vm.prank(alice);
-        options.claimCollateral(1);
-        console2.log("claimed");
-
         vm.warp(1620000000 + 23 hours);
         tokenPayment.mint(address(bob), 1e18);
         vm.prank(bob);
@@ -291,6 +286,11 @@ contract OptionsTest is Test {
         options.buyOption(1);
 
         vm.warp(1620000000 + 240 hours);
+        vm.prank(alice);
+        options.claimCollateral(1);
+
+        token.mint(address(options), 1e18);
+        vm.expectRevert("ALREADY CLAIMED");
         vm.prank(alice);
         options.claimCollateral(1);
     }

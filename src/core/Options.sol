@@ -238,6 +238,7 @@ contract Options is OptionsStorage, IOptions, Tokens {
 
     function claimCollateral(uint256 optionId) public {
         require(msg.sender != address(0), "INVALID ADDRESS");
+        require(!claimMap[optionId], "ALREADY CLAIMED");
         Option memory optionToClaim = optionsMap[optionId];
         require(optionToClaim.creator != address(0), "OPTION NOT FOUND");
         require(
@@ -261,7 +262,7 @@ contract Options is OptionsStorage, IOptions, Tokens {
             ),
             "ASSET1 TRANSFER FAILED"
         );
-
+        claimMap[optionId] = true;
         emit Events.AssetClaimed(
             msg.sender,
             optionId,
