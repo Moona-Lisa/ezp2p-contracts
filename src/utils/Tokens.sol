@@ -95,9 +95,16 @@ abstract contract Tokens is Auth, ITokens, TokensStorage, FunctionsConsumer {
             if (tokensMap[tokensArr[i]].isStable) {
                 continue;
             }
+
             address tokenAddress = tokensArr[i];
-            string[] memory strigifiedAddr;
+
+            // Initialize a string array with size 1
+            string[] memory strigifiedAddr = new string[](1);
+
+            // Convert the address to a string and store it in the array
             strigifiedAddr[0] = Utils.addr2str(tokenAddress);
+
+            // Send the request with the stringified address
             sendRequest(786, strigifiedAddr);
         }
     }

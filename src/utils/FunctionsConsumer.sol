@@ -34,13 +34,13 @@ contract FunctionsConsumer is FunctionsClient, Auth, TokensStorage {
     string source =
         "const tokenAddr = args[0];"
         "const apiResponse = await Functions.makeHttpRequest({"
-        "url: `https://6555fbaf84b36e3a431ec3ed.mockapi.io/api/volatility/${tokenAddr}/`"
+        "url: `ezp2p.finance/api/volatility/${tokenAddr}/`"
         "});"
         "if (apiResponse.error) {"
         "throw Error('Request failed');"
         "}"
         "const { data } = apiResponse;"
-        "let res = data[0];"
+        "let res = data.data[0];"
         "return Functions.encodeString(res);";
 
     //Callback gas limit
@@ -101,11 +101,11 @@ contract FunctionsConsumer is FunctionsClient, Auth, TokensStorage {
         if (response.length > 0) {
             // Parse the response and update the tokensMap
             address tokenAddr = Utils.str2addr(
-                Utils.substring(string(response), 2, 44)
+                Utils.substring(string(response), 11, 53)
             );
 
             uint256 volValue = Utils.str2num(
-                Utils.substring(string(response), 46, 50)
+                Utils.substring(string(response), 70, 74)
             );
 
             require(

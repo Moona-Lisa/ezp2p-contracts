@@ -6,6 +6,7 @@ import {MockOptions} from "./MockOptions.sol";
 import {DataTypes} from "../src/utils/DataTypes.sol";
 import {ERC20} from "../src/lib/ERC20.sol";
 import {MockERC20} from "./MockERC20.sol";
+import {Utils} from "../src/utils/Utils.sol";
 
 contract TokensTest is Test {
     MockOptions public options;
@@ -111,9 +112,19 @@ contract TokensTest is Test {
         options.addToken(testTokenLink);
 
         string
-            memory str = '["0x326C977E6efc84E512bB9C30f76E30c160eD06FB",7069]';
+            memory str = '[{"token":"0x326C977E6efc84E512bB9C30f76E30c160eD06FB","volatility":0.7115863873063887}]';
 
         bytes memory b = bytes(str);
         options.fulfillRequestMock(b);
+        options.updateTokensVolatilityMock();
+
+        // string memory a = Utils.substring(string(b), 11, 53);
+        // console2.log(a);
+        // string memory c = Utils.substring(string(b), 70, 74);
+        // console2.log(c);
+        // address tokenAddr = Utils.str2addr(Utils.substring(string(b), 11, 53));
+
+        // uint256 volValue = Utils.str2num(Utils.substring(string(b), 70, 74));
+        // console2.log(tokenAddr, volValue);
     }
 }

@@ -27,7 +27,7 @@ library Utils {
         string memory str,
         uint startIndex,
         uint endIndex
-    ) public pure returns (string memory) {
+    ) internal pure returns (string memory) {
         bytes memory strBytes = bytes(str);
         bytes memory result = new bytes(endIndex - startIndex);
         for (uint i = startIndex; i < endIndex; i++) {
@@ -36,7 +36,7 @@ library Utils {
         return string(result);
     }
 
-    function str2num(string memory numString) public pure returns (uint256) {
+    function str2num(string memory numString) internal pure returns (uint256) {
         uint256 val = 0;
         bytes memory stringBytes = bytes(numString);
         for (uint i = 0; i < stringBytes.length; i++) {
@@ -50,7 +50,7 @@ library Utils {
         return val;
     }
 
-    function str2addr(string memory str) public pure returns (address) {
+    function str2addr(string memory str) internal pure returns (address) {
         require(
             bytes(str).length == 42,
             "String length must be 42 with '0x' prefix"
