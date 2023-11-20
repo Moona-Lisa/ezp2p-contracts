@@ -28,7 +28,7 @@ abstract contract Tokens is Auth, ITokens, TokensStorage, FunctionsConsumer {
         dataFeed = AggregatorV3Interface(params.priceFeedAddress);
 
         int price;
-        if (!params.isStable) {
+        if (params.isStable) {
             price = 100000000;
         } else {
             (, price, , , ) = dataFeed.latestRoundData();
@@ -43,7 +43,8 @@ abstract contract Tokens is Auth, ITokens, TokensStorage, FunctionsConsumer {
             uint256(price),
             0,
             params.priceFeedAddress,
-            params.isStable
+            params.isStable,
+            0
         );
 
         tokensArr.push(params.tokenAddress);

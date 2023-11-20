@@ -23,12 +23,12 @@ async function main() {
   await new Promise(r => setTimeout(r, 5000));
   await optionsInstance.addToken({
     name: "chainlink", tokenAddress: "0x326C977E6efc84E512bB9C30f76E30c160eD06FB", isAllowed: true, symbol: "LINK", decimals: 18,
-    priceFeedAddress: "0x1C2252aeeD50e0c9B64bDfF2735Ee3C932F5C408", isStable: true
+    priceFeedAddress: "0x1C2252aeeD50e0c9B64bDfF2735Ee3C932F5C408", isStable: false
   });
   await new Promise(r => setTimeout(r, 5000));
   await optionsInstance.addToken({
     name: "Usdc", tokenAddress: "0xe6b8a5CF854791412c1f6EFC7CAf629f5Df1c747", isAllowed: true, symbol: "USDC", decimals: 18,
-    priceFeedAddress: "0x572dDec9087154dC5dfBB1546Bb62713147e0Ab0", isStable: false
+    priceFeedAddress: "0x572dDec9087154dC5dfBB1546Bb62713147e0Ab0", isStable: true
   });
   await new Promise(r => setTimeout(r, 5000));
   await optionsInstance.addToken({

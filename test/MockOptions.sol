@@ -6,6 +6,7 @@ import {DataTypes} from "../src/utils/DataTypes.sol";
 import {Events} from "../src/utils/Events.sol";
 import {Utils} from "../src/utils/Utils.sol";
 import {FunctionsRequest} from "chainlink/contracts/src/v0.8/functions/dev/v1_0_0/libraries/FunctionsRequest.sol";
+import {ERC20} from "../src/lib/ERC20.sol";
 
 contract MockOptions is Options {
     using FunctionsRequest for FunctionsRequest.Request;
@@ -22,7 +23,8 @@ contract MockOptions is Options {
             0,
             0,
             params.priceFeedAddress,
-            params.isStable
+            params.isStable,
+            0
         );
 
         tokensArr.push(params.tokenAddress);
@@ -89,5 +91,42 @@ contract MockOptions is Options {
     ) public view onlyOwner returns (uint64, string[] memory) {
         require(args.length > 0);
         return (subscriptionId, args);
+    }
+
+    function buyOption(uint256 optionId) public override {
+        require(msg.sender != address(0), "INVALID ADDRESS");
+        Option memory optionToBuy = optionsMap[optionId];
+        require(optionToBuy.creator != address(0), "OPTION NOT FOUND");
+        require(optionToBuy.offerExpiryTime > block.timestamp, "OFFER EXPIRED");
+        require(
+            buyersMap[optionId].buyerAddress == address(0),
+            "ALREADY BOUGHT"
+        );
+
+        //  premium is in mock usdc token
+        require(
+            ERC20(address(0x5991A2dF15A8F6A256D3Ec51E99254Cd3fb576A9))
+                .balanceOf(msg.sender) >= optionToBuy.premium,
+            "INSUFFICIENT TOKEN BALANCE"
+        );
+        require(
+            ERC20(address(0x5991A2dF15A8F6A256D3Ec51E99254Cd3fb576A9))
+                .allowance(msg.sender, address(this)) >= optionToBuy.premium,
+            "INSUFFICIENT TOKEN ALLOWANCE"
+        );
+
+        require(
+            ERC20(address(0x5991A2dF15A8F6A256D3Ec51E99254Cd3fb576A9))
+                .transferFrom(
+                    msg.sender,
+                    optionToBuy.creator,
+                    optionToBuy.premium
+                ),
+            "ASSET2 TRANSFER FAILED"
+        );
+
+        buyersMap[optionId] = Buyer(msg.sender, false);
+
+        emit Events.OptionBought(optionId, msg.sender);
     }
 }

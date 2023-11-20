@@ -26,25 +26,25 @@ contract BSMTest is Test {
 
     function test_BSMOptionPrice() public {
         vm.expectRevert("CURRENT PRICE MUST BE POSITIVE");
-        bsm.BSMOptionPrice(isCall, S, K, T, r, v);
+        bsm.getOptionPremium(isCall, S, K, T, r, v);
 
         S = sd(37000e18);
         vm.expectRevert("STRIKE PRICE MUST BE POSITIVE");
-        bsm.BSMOptionPrice(isCall, S, K, T, r, v);
+        bsm.getOptionPremium(isCall, S, K, T, r, v);
 
         K = sd(40000e18);
         vm.expectRevert("TIME MUST BE >= 0.00273");
-        bsm.BSMOptionPrice(isCall, S, K, T, r, v);
+        bsm.getOptionPremium(isCall, S, K, T, r, v);
 
         T = sd(0.00274e18);
         vm.expectRevert("VOLATILITY MUST BE > 0");
-        bsm.BSMOptionPrice(isCall, S, K, T, r, v);
+        bsm.getOptionPremium(isCall, S, K, T, r, v);
 
         v = sd(1e18);
         vm.expectRevert("VOLATILITY MUST BE < 1");
-        bsm.BSMOptionPrice(isCall, S, K, T, r, v);
+        bsm.getOptionPremium(isCall, S, K, T, r, v);
 
         v = sd(0.5e18);
-        bsm.BSMOptionPrice(isCall, S, K, T, r, v);
+        bsm.getOptionPremium(isCall, S, K, T, r, v);
     }
 }

@@ -11,6 +11,7 @@ contract OptionsTest is Test {
     MockOptions public options;
     MockERC20 public token;
     MockERC20 public tokenUSDC;
+    MockERC20 public tokenPayment;
 
     // address public immutable owner;
     address constant alice = address(0xA11CE);
@@ -24,12 +25,13 @@ contract OptionsTest is Test {
         options = new MockOptions();
         token = new MockERC20("Token", "TKN", 18);
         tokenUSDC = new MockERC20("usdc", "USDC", 18);
+        tokenPayment = new MockERC20("payment", "PAY", 18);
         optionParams = DataTypes.CreateOptionParams(
             "test",
             2,
             500,
             0,
-            0,
+            450,
             address(token),
             address(tokenUSDC),
             0,
@@ -121,7 +123,13 @@ contract OptionsTest is Test {
 
         optionParams.offerExpiryAfterHours = 24;
         optionParams.exerciseTimeInHours = 24;
-        // TODO: check premium price
+
+        optionParams.premium = 0;
+        vm.expectRevert("PREMIUM MUST BE POSITIVE");
+        vm.prank(alice);
+        options.createOption(optionParams);
+
+        optionParams.premium = 500;
     }
 
     //  test createOption with payable
@@ -155,8 +163,12 @@ contract OptionsTest is Test {
 
         // TODO: test transfer premium to creator
         vm.warp(1620000000 - 10 hours);
-        vm.prank(alice);
+        tokenPayment.mint(address(bob), 1e18);
+        vm.prank(bob);
+        tokenPayment.approve(address(options), 450);
+        vm.prank(bob);
         options.buyOption(1);
+        tokenPayment.balanceOf(address(alice));
         vm.expectRevert("ALREADY BOUGHT");
         vm.prank(bob);
         options.buyOption(1);
@@ -178,6 +190,9 @@ contract OptionsTest is Test {
         vm.prank(bob);
         options.exerciseOption(1);
 
+        tokenPayment.mint(address(bob), 1e18);
+        vm.prank(bob);
+        tokenPayment.approve(address(options), 450);
         vm.prank(bob);
         options.buyOption(1);
 
@@ -208,5 +223,75 @@ contract OptionsTest is Test {
         vm.expectRevert("ALREADY EXERCISED");
         vm.prank(bob);
         options.exerciseOption(1);
+    }
+
+    /*//////////////////////////////////////////////////////////////
+                            TEST CLAIM ASSET1
+    //////////////////////////////////////////////////////////////*/
+
+    // test claimAsset1 function
+    function test_claimAsset1() public {
+        optionSetup();
+        vm.warp(1620000000);
+        vm.expectRevert("OFFER NOT EXPIRED YET");
+        vm.prank(alice);
+        options.claimCollateral(1);
+
+        vm.warp(1620000000 + 25 hours);
+        vm.prank(alice);
+        options.claimCollateral(1);
+        console2.log("claimed");
+
+        vm.warp(1620000000 + 23 hours);
+        tokenPayment.mint(address(bob), 1e18);
+        vm.prank(bob);
+        tokenPayment.approve(address(options), 450);
+        vm.prank(bob);
+        options.buyOption(1);
+        vm.warp(1620000000 + 25 hours);
+        vm.expectRevert("OPTION IS BOUGHT");
+        vm.prank(alice);
+        options.claimCollateral(1);
+    }
+
+    function test_claimAsset1_2() public {
+        optionSetup();
+
+        vm.warp(1620000000 + 23 hours);
+        tokenPayment.mint(address(bob), 1e18);
+        vm.prank(bob);
+        tokenPayment.approve(address(options), 450);
+        vm.prank(bob);
+        options.buyOption(1);
+        vm.warp(1620000000 + 25 hours);
+        vm.expectRevert("OPTION IS BOUGHT");
+        vm.prank(alice);
+        options.claimCollateral(1);
+
+        vm.warp(1620000000 + 77 hours);
+        tokenUSDC.mint(address(bob), 1e18);
+        vm.prank(bob);
+        tokenUSDC.approve(address(options), 500);
+        vm.prank(bob);
+        options.exerciseOption(1);
+        vm.warp(1620000000 + 240 hours);
+        vm.expectRevert("OPTION IS EXERCISED");
+        vm.prank(alice);
+        options.claimCollateral(1);
+    }
+
+    function test_claimAsset1_3() public {
+        optionSetup();
+
+        vm.warp(1620000000 + 23 hours);
+        tokenPayment.mint(address(bob), 1e18);
+        vm.prank(bob);
+        tokenPayment.approve(address(options), 450);
+        vm.prank(bob);
+        options.buyOption(1);
+
+        vm.warp(1620000000 + 240 hours);
+        vm.prank(alice);
+        options.claimCollateral(1);
     }
 }

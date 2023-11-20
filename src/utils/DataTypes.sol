@@ -7,7 +7,7 @@ library DataTypes {
         uint256 nbOfDays;
         uint256 strikePrice;
         uint256 amount;
-        uint256 premiumPrice;
+        uint256 premium;
         address asset1;
         address asset2;
         uint256 offerExpiryAfterHours;

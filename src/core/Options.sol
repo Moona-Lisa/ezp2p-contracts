@@ -80,7 +80,7 @@ contract Options is OptionsStorage, IOptions, Tokens {
     }
 
     /// @inheritdoc IOptions
-    function buyOption(uint256 optionId) public {
+    function buyOption(uint256 optionId) public virtual {
         require(msg.sender != address(0), "INVALID ADDRESS");
         Option memory optionToBuy = optionsMap[optionId];
         require(optionToBuy.creator != address(0), "OPTION NOT FOUND");
@@ -90,7 +90,27 @@ contract Options is OptionsStorage, IOptions, Tokens {
             "ALREADY BOUGHT"
         );
 
-        //  TODO: transfer premium to the creator
+        //  premium is in usdc token
+        require(
+            ERC20(address(0xe6b8a5CF854791412c1f6EFC7CAf629f5Df1c747))
+                .balanceOf(msg.sender) >= optionToBuy.premium,
+            "INSUFFICIENT TOKEN BALANCE"
+        );
+        require(
+            ERC20(address(0xe6b8a5CF854791412c1f6EFC7CAf629f5Df1c747))
+                .allowance(msg.sender, address(this)) >= optionToBuy.premium,
+            "INSUFFICIENT TOKEN ALLOWANCE"
+        );
+
+        require(
+            ERC20(address(0xe6b8a5CF854791412c1f6EFC7CAf629f5Df1c747))
+                .transferFrom(
+                    msg.sender,
+                    optionToBuy.creator,
+                    optionToBuy.premium
+                ),
+            "ASSET2 TRANSFER FAILED"
+        );
 
         buyersMap[optionId] = Buyer(msg.sender, false);
 
@@ -119,7 +139,7 @@ contract Options is OptionsStorage, IOptions, Tokens {
             endTime,
             params.strikePrice,
             params.amount,
-            params.premiumPrice,
+            params.premium,
             params.asset1,
             params.asset2,
             params.isCall,
@@ -137,7 +157,7 @@ contract Options is OptionsStorage, IOptions, Tokens {
             endTime,
             params.strikePrice,
             params.amount,
-            params.premiumPrice,
+            params.premium,
             params.asset1,
             params.asset2,
             params.isCall,
@@ -178,6 +198,7 @@ contract Options is OptionsStorage, IOptions, Tokens {
             params.exerciseTimeInHours > 0,
             "EXERCISE TIME MUST BE POSITIVE"
         );
+        require(params.premium > 0, "PREMIUM MUST BE POSITIVE");
 
         uint256 endTime = Utils.getDurationEndTimeForDays(
             block.timestamp,
@@ -208,12 +229,43 @@ contract Options is OptionsStorage, IOptions, Tokens {
             "INSUFFICIENT TOKEN BALANCE"
         );
 
-        // TODO : check premium price
-
         return (endTime, offerExpiryTime, exerciseTime);
     }
 
     function readOption(uint256 optionId) public view returns (Option memory) {
         return optionsMap[optionId];
+    }
+
+    function claimCollateral(uint256 optionId) public {
+        require(msg.sender != address(0), "INVALID ADDRESS");
+        Option memory optionToClaim = optionsMap[optionId];
+        require(optionToClaim.creator != address(0), "OPTION NOT FOUND");
+        require(
+            optionToClaim.offerExpiryTime < block.timestamp,
+            "OFFER NOT EXPIRED YET"
+        );
+
+        if (optionToClaim.endTime > block.timestamp) {
+            require(
+                buyersMap[optionId].buyerAddress == address(0),
+                "OPTION IS BOUGHT"
+            );
+        } else {
+            require(!buyersMap[optionId].hasExercised, "OPTION IS EXERCISED");
+        }
+
+        require(
+            ERC20(optionToClaim.asset1).transfer(
+                optionToClaim.creator,
+                optionToClaim.totalAmount
+            ),
+            "ASSET1 TRANSFER FAILED"
+        );
+
+        emit Events.AssetClaimed(
+            msg.sender,
+            optionId,
+            optionToClaim.totalAmount
+        );
     }
 }
