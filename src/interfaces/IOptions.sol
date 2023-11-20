@@ -11,28 +11,11 @@ import {DataTypes} from "../utils/DataTypes.sol";
  */
 interface IOptions {
     /**
-     * @notice Adds a token to the whitelist.
+     * @notice Exercies an option.
      *
-     * @param name The name of the token.
-     * @param tokenAddress The address of the token.
-     * @param isAllowed Whether the token is allowed or not.
-     * @param symbol The symbol of the token.
+     * @param optionId The id of the option.
      */
-    function addToken(
-        string memory name,
-        address tokenAddress,
-        bool isAllowed,
-        string memory symbol,
-        uint256 decimals
-    ) external;
-
-    /**
-     * @notice Allows or disallows a token.
-     *
-     * @param tokenAddress The address of the token.
-     * @param status Whether the token is allowed or not.
-     */
-    function allowToken(address tokenAddress, bool status) external;
+    function exerciseOption(uint256 optionId) external;
 
     /**
      * @notice Checks if the option can be created.
@@ -53,4 +36,11 @@ interface IOptions {
      * @param params The parameters of the option.
      */
     function createOption(DataTypes.CreateOptionParams memory params) external;
+
+    /**
+     * @notice Buys an option.
+     *
+     * @param optionId The id of the option.
+     */
+    function buyOption(uint256 optionId) external;
 }
