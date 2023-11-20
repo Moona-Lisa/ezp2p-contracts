@@ -10,6 +10,7 @@ import {MockERC20} from "./MockERC20.sol";
 contract OptionsTest is Test {
     MockOptions public options;
     MockERC20 public token;
+    MockERC20 public tokenUSDC;
 
     // address public immutable owner;
     address constant alice = address(0xA11CE);
@@ -22,14 +23,15 @@ contract OptionsTest is Test {
     function setUp() public {
         options = new MockOptions();
         token = new MockERC20("Token", "TKN", 18);
+        tokenUSDC = new MockERC20("usdc", "USDC", 18);
         optionParams = DataTypes.CreateOptionParams(
             "test",
             2,
             500,
             0,
             0,
-            address(0x1351),
             address(token),
+            address(tokenUSDC),
             0,
             0,
             true
@@ -37,18 +39,18 @@ contract OptionsTest is Test {
 
         testTokenParams1 = DataTypes.CreateTokenParams(
             "Token",
-            address(0x1351),
+            address(token),
             true,
-            "test",
+            "TKN",
             18,
             address(0x1351),
             false
         );
         testTokenParams2 = DataTypes.CreateTokenParams(
-            "Token",
-            address(token),
+            "TokenUSDC",
+            address(tokenUSDC),
             true,
-            "TKN",
+            "USDC",
             18,
             address(0x1351),
             false
@@ -60,7 +62,6 @@ contract OptionsTest is Test {
         optionParams.nbOfDays = 4;
         optionParams.offerExpiryAfterHours = 24;
         optionParams.exerciseTimeInHours = 24;
-        optionParams.asset1 = address(token);
         options.addToken(testTokenParams2);
         options.addToken(testTokenParams1);
         vm.warp(1620000000);
@@ -92,7 +93,7 @@ contract OptionsTest is Test {
         vm.prank(alice);
         options.createOption(optionParams);
 
-        options.allowToken(address(token), true);
+        options.allowToken(address(tokenUSDC), true);
         vm.expectRevert("AMOUNT MUST BE POSITIVE");
         vm.prank(alice);
         options.createOption(optionParams);
@@ -168,16 +169,16 @@ contract OptionsTest is Test {
     // test exerciseOption function
     function test_exerciseOption() public {
         vm.expectRevert("OPTION NOT FOUND");
-        vm.prank(alice);
+        vm.prank(bob);
         options.exerciseOption(0);
 
         optionSetup();
 
         vm.expectRevert("NOT BOUGHT YET");
-        vm.prank(alice);
+        vm.prank(bob);
         options.exerciseOption(1);
 
-        vm.prank(alice);
+        vm.prank(bob);
         options.buyOption(1);
 
         vm.expectRevert("INVALID ADDRESS");
@@ -186,24 +187,26 @@ contract OptionsTest is Test {
 
         vm.warp(1620000000);
         vm.expectRevert("NOT EXERCISABLE");
-        vm.prank(alice);
+        vm.prank(bob);
         options.exerciseOption(1);
 
-        // options.Option memory optionToExercise = options.optionsMap[1];
         vm.warp(1620000000 + 240 hours);
         vm.expectRevert("HAS EXPIRED");
-        vm.prank(alice);
+        vm.prank(bob);
         options.exerciseOption(1);
 
         vm.warp(1620000000 + 77 hours);
         vm.expectRevert("NOT YOUR OPTION");
-        vm.prank(bob);
+        vm.prank(alice);
         options.exerciseOption(1);
 
-        vm.prank(alice);
+        tokenUSDC.mint(address(bob), 1e18);
+        vm.prank(bob);
+        tokenUSDC.approve(address(options), 500);
+        vm.prank(bob);
         options.exerciseOption(1);
         vm.expectRevert("ALREADY EXERCISED");
-        vm.prank(alice);
+        vm.prank(bob);
         options.exerciseOption(1);
     }
 }

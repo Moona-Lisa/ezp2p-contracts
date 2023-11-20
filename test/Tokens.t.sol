@@ -117,14 +117,5 @@ contract TokensTest is Test {
         bytes memory b = bytes(str);
         options.fulfillRequestMock(b);
         options.updateTokensVolatilityMock();
-
-        // string memory a = Utils.substring(string(b), 11, 53);
-        // console2.log(a);
-        // string memory c = Utils.substring(string(b), 70, 74);
-        // console2.log(c);
-        // address tokenAddr = Utils.str2addr(Utils.substring(string(b), 11, 53));
-
-        // uint256 volValue = Utils.str2num(Utils.substring(string(b), 70, 74));
-        // console2.log(tokenAddr, volValue);
     }
 }

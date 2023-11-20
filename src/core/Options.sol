@@ -46,21 +46,34 @@ contract Options is OptionsStorage, IOptions, Tokens {
         require(block.timestamp < optionToExercise.endTime, "HAS EXPIRED");
         require(buyer.buyerAddress == msg.sender, "NOT YOUR OPTION");
 
-        // TODO: transfer the asset2 to the contract and the asset1 to the buyer
-        // require(
-        //     ERC20(optionToExercise.asset2).transfer(
-        //         address(this),
-        //         optionToExercise.totalAmount
-        //     ),
-        //     "ASSET2 TRANSFER FAILED"
-        // );
-        // require(
-        //     ERC20(optionToExercise.asset1).transfer(
-        //         msg.sender,
-        //         optionToExercise.totalAmount
-        //     ),
-        //     "ASSET1 TRANSFER FAILED"
-        // );
+        require(
+            ERC20(optionToExercise.asset2).balanceOf(msg.sender) >=
+                optionToExercise.strikePrice,
+            "INSUFFICIENT TOKEN BALANCE"
+        );
+        require(
+            ERC20(optionToExercise.asset2).allowance(
+                msg.sender,
+                address(this)
+            ) >= optionToExercise.strikePrice,
+            "INSUFFICIENT TOKEN ALLOWANCE"
+        );
+
+        require(
+            ERC20(optionToExercise.asset2).transferFrom(
+                msg.sender,
+                optionToExercise.creator,
+                optionToExercise.strikePrice
+            ),
+            "ASSET2 TRANSFER FAILED"
+        );
+        require(
+            ERC20(optionToExercise.asset1).transfer(
+                msg.sender,
+                optionToExercise.totalAmount
+            ),
+            "ASSET1 TRANSFER FAILED"
+        );
 
         buyersMap[optionId].hasExercised = true;
         emit Events.OptionExercised(optionId, msg.sender);
@@ -198,5 +211,9 @@ contract Options is OptionsStorage, IOptions, Tokens {
         // TODO : check premium price
 
         return (endTime, offerExpiryTime, exerciseTime);
+    }
+
+    function readOption(uint256 optionId) public view returns (Option memory) {
+        return optionsMap[optionId];
     }
 }

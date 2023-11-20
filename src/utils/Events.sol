@@ -26,8 +26,8 @@ library Events {
     event AllowToken(address tokenAddress, bool status);
 
     event OptionCreated(
-        uint256 indexed optionId,
-        address indexed creator,
+        uint256 optionId,
+        address creator,
         string symbol,
         uint256 endTime,
         uint256 strikePrice,
