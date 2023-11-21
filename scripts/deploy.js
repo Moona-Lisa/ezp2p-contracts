@@ -27,12 +27,12 @@ async function main() {
   });
   await new Promise(r => setTimeout(r, 5000));
   await optionsInstance.addToken({
-    name: "usdc", tokenAddress: "0x52D800ca262522580CeBAD275395ca6e7598C014", isAllowed: true, symbol: "USDC", decimals: 18,
+    name: "usdc", tokenAddress: "0x52D800ca262522580CeBAD275395ca6e7598C014", isAllowed: true, symbol: "USDC", decimals: 6,
     priceFeedAddress: "0x572dDec9087154dC5dfBB1546Bb62713147e0Ab0", isStable: true
   });
   await new Promise(r => setTimeout(r, 5000));
   await optionsInstance.addToken({
-    name: "bitcoin", tokenAddress: "0x2Fa2e7a6dEB7bb51B625336DBe1dA23511914a8A", isAllowed: true, symbol: "WBTC", decimals: 18,
+    name: "bitcoin", tokenAddress: "0x2Fa2e7a6dEB7bb51B625336DBe1dA23511914a8A", isAllowed: true, symbol: "WBTC", decimals: 8,
     priceFeedAddress: "0x007A22900a3B98143368Bd5906f8E17e9867581b", isStable: false
   });
   await new Promise(r => setTimeout(r, 5000));
