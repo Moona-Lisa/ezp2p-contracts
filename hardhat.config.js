@@ -38,24 +38,37 @@ module.exports = {
     cache: "./cache_hardhat",
   },
   networks: {
-    mumbai: {
-      url: "https://rpc-mumbai.maticvigil.com",
+    // mumbai: {
+    //   url: "https://rpc-mumbai.maticvigil.com",
+    //   accounts:
+    //     [PRIVATE_KEY],
+    // },
+    fuji: {
+      url: "https://api.avax-test.network/ext/bc/C/rpc",
       accounts:
         [PRIVATE_KEY],
     },
   },
   etherscan: {
     apiKey: ETHERSCAN_API_KEY,
-    customChains: [
-      {
-        network: 'mumbai',
-        chainId: 80001,
-        urls: {
-          apiURL: MUMBAI_RPC_URL,
-          browserURL: "https://mumbai.polygonscan.com/",
-        },
-      },
-    ]
+    // customChains: [
+    //   {
+    //     network: 'mumbai',
+    //     chainId: 80001,
+    //     urls: {
+    //       apiURL: MUMBAI_RPC_URL,
+    //       browserURL: "https://mumbai.polygonscan.com/",
+    //     },
+    //   },
+    //   {
+    //     network: 'fuji',
+    //     chainId: 43113,
+    //     urls: {
+    //       apiURL: "https://api.avax-test.network/ext/bc/C/rpc",
+    //       browserURL: "https://cchain.explorer.avax-test.network/",
+    //     },
+    //   },
+    // ]
   },
 };
 
