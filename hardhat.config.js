@@ -3,7 +3,6 @@ require("hardhat-preprocessor");
 const fs = require("fs");
 require('dotenv').config();
 
-const MUMBAI_RPC_URL = process.env.MUMBAI_RPC_URL
 const ETHERSCAN_API_KEY = process.env.ETHERSCAN_API_KEY
 const PRIVATE_KEY = process.env.PRIVATE_KEY
 
@@ -38,11 +37,6 @@ module.exports = {
     cache: "./cache_hardhat",
   },
   networks: {
-    // mumbai: {
-    //   url: "https://rpc-mumbai.maticvigil.com",
-    //   accounts:
-    //     [PRIVATE_KEY],
-    // },
     fuji: {
       url: "https://api.avax-test.network/ext/bc/C/rpc",
       accounts:
@@ -51,24 +45,6 @@ module.exports = {
   },
   etherscan: {
     apiKey: ETHERSCAN_API_KEY,
-    // customChains: [
-    //   {
-    //     network: 'mumbai',
-    //     chainId: 80001,
-    //     urls: {
-    //       apiURL: MUMBAI_RPC_URL,
-    //       browserURL: "https://mumbai.polygonscan.com/",
-    //     },
-    //   },
-    //   {
-    //     network: 'fuji',
-    //     chainId: 43113,
-    //     urls: {
-    //       apiURL: "https://api.avax-test.network/ext/bc/C/rpc",
-    //       browserURL: "https://cchain.explorer.avax-test.network/",
-    //     },
-    //   },
-    // ]
   },
 };
 
