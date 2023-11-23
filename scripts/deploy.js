@@ -1,9 +1,3 @@
-// We require the Hardhat Runtime Environment explicitly here. This is optional
-// but useful for running the script in a standalone fashion through `node <script>`.
-//
-// You can also run a script with `npx hardhat run <script>`. If you do that, Hardhat
-// will compile your contracts, add the Hardhat Runtime Environment's members to the
-// global scope, and execute the script.
 const hre = require("hardhat");
 require('dotenv').config();
 
@@ -40,8 +34,6 @@ async function main() {
     name: "ethereum", tokenAddress: "0xf97b6C636167B529B6f1D729Bd9bC0e2Bd491848", isAllowed: true, symbol: "WETH", decimals: 18,
     priceFeedAddress: "0x86d67c3D38D2bCeE722E601025C25a575021c6EA", isStable: false
   });
-
-  console.log("Token added successfully.");
 
   await hre.run("verify:verify", {
     address: deployAddr,

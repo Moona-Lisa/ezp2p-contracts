@@ -13,6 +13,12 @@ import {IBSM} from "../interfaces/IBSM.sol";
  */
 contract BSM is BSMStorage, IBSM {
     /*//////////////////////////////////////////////////////////////
+                                 CONSTRUCTOR
+    //////////////////////////////////////////////////////////////*/
+
+    constructor() {}
+
+    /*//////////////////////////////////////////////////////////////
                               PUBLIC VIEW
     //////////////////////////////////////////////////////////////*/
 
@@ -58,9 +64,5 @@ contract BSM is BSMStorage, IBSM {
         SD59x18 poly = mul(mul(mul((mul(B5, t) + B4), t) + B3, t) + B2, t) + B1;
         SD59x18 result = mul(mul(mul(C, expValue), t), poly);
         return x >= 0 ? (UNIT - result) : result;
-    }
-
-    function ret(SD59x18 x) public pure returns (SD59x18) {
-        return x;
     }
 }
