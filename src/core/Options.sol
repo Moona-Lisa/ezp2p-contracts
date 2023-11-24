@@ -92,18 +92,18 @@ contract Options is OptionsStorage, IOptions, Tokens {
 
         //  premium is in usdc token
         require(
-            ERC20(address(0xe6b8a5CF854791412c1f6EFC7CAf629f5Df1c747))
+            ERC20(address(0xCaC7Ffa82c0f43EBB0FC11FCd32123EcA46626cf))
                 .balanceOf(msg.sender) >= optionToBuy.premium,
             "INSUFFICIENT TOKEN BALANCE"
         );
         require(
-            ERC20(address(0xe6b8a5CF854791412c1f6EFC7CAf629f5Df1c747))
+            ERC20(address(0xCaC7Ffa82c0f43EBB0FC11FCd32123EcA46626cf))
                 .allowance(msg.sender, address(this)) >= optionToBuy.premium,
             "INSUFFICIENT TOKEN ALLOWANCE"
         );
 
         require(
-            ERC20(address(0xe6b8a5CF854791412c1f6EFC7CAf629f5Df1c747))
+            ERC20(address(0xCaC7Ffa82c0f43EBB0FC11FCd32123EcA46626cf))
                 .transferFrom(
                     msg.sender,
                     optionToBuy.creator,
