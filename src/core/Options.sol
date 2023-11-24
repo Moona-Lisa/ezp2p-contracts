@@ -48,14 +48,14 @@ contract Options is OptionsStorage, IOptions, Tokens {
 
         require(
             ERC20(optionToExercise.asset2).balanceOf(msg.sender) >=
-                optionToExercise.strikePrice,
+                optionToExercise.amount2,
             "INSUFFICIENT TOKEN BALANCE"
         );
         require(
             ERC20(optionToExercise.asset2).allowance(
                 msg.sender,
                 address(this)
-            ) >= optionToExercise.strikePrice,
+            ) >= optionToExercise.amount2,
             "INSUFFICIENT TOKEN ALLOWANCE"
         );
 
@@ -63,14 +63,14 @@ contract Options is OptionsStorage, IOptions, Tokens {
             ERC20(optionToExercise.asset2).transferFrom(
                 msg.sender,
                 optionToExercise.creator,
-                optionToExercise.strikePrice
+                optionToExercise.amount2
             ),
             "ASSET2 TRANSFER FAILED"
         );
         require(
             ERC20(optionToExercise.asset1).transfer(
                 msg.sender,
-                optionToExercise.totalAmount
+                optionToExercise.amount1
             ),
             "ASSET1 TRANSFER FAILED"
         );
@@ -128,7 +128,7 @@ contract Options is OptionsStorage, IOptions, Tokens {
             ERC20(params.asset1).transferFrom(
                 msg.sender,
                 address(this),
-                params.amount
+                params.amount1
             ),
             "ASSET1 TRANSFER FAILED"
         );
@@ -137,8 +137,8 @@ contract Options is OptionsStorage, IOptions, Tokens {
             msg.sender,
             params.symbol,
             endTime,
-            params.strikePrice,
-            params.amount,
+            params.amount1,
+            params.amount2,
             params.premium,
             params.asset1,
             params.asset2,
@@ -155,8 +155,8 @@ contract Options is OptionsStorage, IOptions, Tokens {
             msg.sender,
             params.symbol,
             endTime,
-            params.strikePrice,
-            params.amount,
+            params.amount1,
+            params.amount2,
             params.premium,
             params.asset1,
             params.asset2,
@@ -179,19 +179,19 @@ contract Options is OptionsStorage, IOptions, Tokens {
             "ASSET1 NOT FOUND"
         );
         require(
-            !tokensMap[params.asset1].isStable,
-            "ASSET1 CAN NOT BE A STABLECOIN"
-        );
-        require(
             tokensMap[params.asset2].tokenAddress != address(0),
             "ASSET2 NOT FOUND"
         );
         require(tokensMap[params.asset1].isAllowed, "ASSET1 NOT ALLOWED");
         require(tokensMap[params.asset2].isAllowed, "ASSET2 NOT ALLOWED");
-        require(params.amount > 0, "AMOUNT MUST BE POSITIVE");
-        require(params.nbOfDays > 3, "DURATION MUST BE MORE THAN 3 DAYS");
+        require(params.amount1 > 0, "AMOUNT1 MUST BE POSITIVE");
+        require(params.amount2 > 0, "AMOUNT2 MUST BE POSITIVE");
         require(
-            params.offerExpiryAfterHours > 0,
+            params.totalDurationInDays > 3,
+            "DURATION MUST BE MORE THAN 3 DAYS"
+        );
+        require(
+            params.offerTimeInHours > 0,
             "OFFER EXPIRY TIME MUST BE POSITIVE"
         );
         require(
@@ -202,11 +202,11 @@ contract Options is OptionsStorage, IOptions, Tokens {
 
         uint256 endTime = Utils.getDurationEndTimeForDays(
             block.timestamp,
-            params.nbOfDays
+            params.totalDurationInDays
         );
         uint256 offerExpiryTime = Utils.getDurationEndTimeForHours(
             block.timestamp,
-            params.offerExpiryAfterHours
+            params.offerTimeInHours
         );
         uint256 exerciseTime = Utils.getDurationStartTimeForHours(
             endTime,
@@ -220,20 +220,16 @@ contract Options is OptionsStorage, IOptions, Tokens {
 
         require(
             ERC20(params.asset1).allowance(msg.sender, address(this)) >=
-                params.amount,
+                params.amount1,
             "INSUFFICIENT TOKEN ALLOWANCE"
         );
 
         require(
-            ERC20(params.asset1).balanceOf(msg.sender) >= params.amount,
+            ERC20(params.asset1).balanceOf(msg.sender) >= params.amount1,
             "INSUFFICIENT TOKEN BALANCE"
         );
 
         return (endTime, offerExpiryTime, exerciseTime);
-    }
-
-    function readOption(uint256 optionId) public view returns (Option memory) {
-        return optionsMap[optionId];
     }
 
     function claimCollateral(uint256 optionId) public {
@@ -258,15 +254,11 @@ contract Options is OptionsStorage, IOptions, Tokens {
         require(
             ERC20(optionToClaim.asset1).transfer(
                 optionToClaim.creator,
-                optionToClaim.totalAmount
+                optionToClaim.amount1
             ),
             "ASSET1 TRANSFER FAILED"
         );
         claimMap[optionId] = true;
-        emit Events.AssetClaimed(
-            msg.sender,
-            optionId,
-            optionToClaim.totalAmount
-        );
+        emit Events.AssetClaimed(msg.sender, optionId, optionToClaim.amount1);
     }
 }

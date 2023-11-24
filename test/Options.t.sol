@@ -29,8 +29,8 @@ contract OptionsTest is Test {
         optionParams = DataTypes.CreateOptionParams(
             "test",
             2,
-            500,
             0,
+            500,
             450,
             address(token),
             address(tokenUSDC),
@@ -60,9 +60,9 @@ contract OptionsTest is Test {
     }
 
     function optionSetup() public {
-        optionParams.amount = 5000;
-        optionParams.nbOfDays = 4;
-        optionParams.offerExpiryAfterHours = 24;
+        optionParams.amount1 = 5000;
+        optionParams.totalDurationInDays = 4;
+        optionParams.offerTimeInHours = 24;
         optionParams.exerciseTimeInHours = 24;
         options.addToken(testTokenParams2);
         options.addToken(testTokenParams1);
@@ -96,21 +96,21 @@ contract OptionsTest is Test {
         options.createOption(optionParams);
 
         options.allowToken(address(tokenUSDC), true);
-        vm.expectRevert("AMOUNT MUST BE POSITIVE");
+        vm.expectRevert("AMOUNT1 MUST BE POSITIVE");
         vm.prank(alice);
         options.createOption(optionParams);
 
-        optionParams.amount = 5000;
+        optionParams.amount1 = 5000;
         vm.expectRevert("DURATION MUST BE MORE THAN 3 DAYS");
         vm.prank(alice);
         options.createOption(optionParams);
 
-        optionParams.nbOfDays = 4;
+        optionParams.totalDurationInDays = 4;
         vm.expectRevert("OFFER EXPIRY TIME MUST BE POSITIVE");
         vm.prank(alice);
         options.createOption(optionParams);
 
-        optionParams.offerExpiryAfterHours = 48;
+        optionParams.offerTimeInHours = 48;
         vm.expectRevert("EXERCISE TIME MUST BE POSITIVE");
         vm.prank(alice);
         options.createOption(optionParams);
@@ -121,7 +121,7 @@ contract OptionsTest is Test {
         vm.prank(alice);
         options.createOption(optionParams);
 
-        optionParams.offerExpiryAfterHours = 24;
+        optionParams.offerTimeInHours = 24;
         optionParams.exerciseTimeInHours = 24;
 
         optionParams.premium = 0;
@@ -161,8 +161,7 @@ contract OptionsTest is Test {
         vm.prank(bob);
         options.buyOption(1);
 
-        // TODO: test transfer premium to creator
-        vm.warp(1620000000 - 10 hours);
+        vm.warp(1620000000 + 10 hours);
         tokenPayment.mint(address(bob), 1e18);
         vm.prank(bob);
         tokenPayment.approve(address(options), 450);
