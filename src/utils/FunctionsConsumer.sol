@@ -28,27 +28,28 @@ contract FunctionsConsumer is FunctionsClient, Auth, TokensStorage {
     event Response(bytes32 indexed requestId, bytes response, bytes err);
 
     // Router address - Hardcoded for Mumbai
-    address router = 0x6E2dc0F9DB014aE19888F539E59285D2Ea04244C;
+    address router = 0xA9d587a00A31A52Ed70D6026794a8FC5E2F5dCb0;
 
     // JavaScript source code
     string source =
-        "const tokenAddr = args[0];"
+        "const addr = args[0];"
         "const apiResponse = await Functions.makeHttpRequest({"
-        "url: `ezp2p.finance/api/volatility/${tokenAddr}/`"
+        "url: `https://elgzbdxzycxyhcnpglte.supabase.co/rest/v1/tokens?contract_addr=eq.${addr}&select=contract_addr,annualized_volatility`,"
+        "headers: {'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVsZ3piZHh6eWN4eWhjbnBnbHRlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDA2NTc3NDAsImV4cCI6MjAxNjIzMzc0MH0.9Rxf8xtFL-KtIErifLJaJ99z-S6v_PnL4gnzjvInzI8'},"
         "});"
         "if (apiResponse.error) {"
         "throw Error('Request failed');"
         "}"
         "const { data } = apiResponse;"
-        "let res = data.data[0];"
-        "return Functions.encodeString(res);";
+        "let structure = data[0].contract_addr + ',' +data[0].annualized_volatility;"
+        "return Functions.encodeString(structure);";
 
     //Callback gas limit
     uint32 gasLimit = 300000;
 
     // donID - Hardcoded for Mumbai
     bytes32 donID =
-        0x66756e2d706f6c79676f6e2d6d756d6261692d31000000000000000000000000;
+        0x66756e2d6176616c616e6368652d66756a692d31000000000000000000000000;
 
     /**
      * @notice Initializes the contract with the Chainlink router address and sets the contract owner
@@ -101,11 +102,11 @@ contract FunctionsConsumer is FunctionsClient, Auth, TokensStorage {
         if (response.length > 0) {
             // Parse the response and update the tokensMap
             address tokenAddr = Utils.str2addr(
-                Utils.substring(string(response), 11, 53)
+                Utils.substring(string(response), 0, 42)
             );
 
             uint256 volValue = Utils.str2num(
-                Utils.substring(string(response), 70, 74)
+                Utils.substring(string(response), 43, 51)
             );
 
             require(

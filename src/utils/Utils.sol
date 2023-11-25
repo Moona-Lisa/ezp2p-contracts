@@ -4,9 +4,9 @@ pragma solidity ^0.8.13;
 library Utils {
     function getDurationEndTimeForDays(
         uint256 startTime,
-        uint256 nbOfDays
+        uint256 totalDurationInDays
     ) internal pure returns (uint256) {
-        return (startTime + (nbOfDays * 86400));
+        return (startTime + (totalDurationInDays * 86400));
     }
 
     function getDurationEndTimeForHours(

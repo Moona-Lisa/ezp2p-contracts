@@ -22,7 +22,7 @@ interface IBSM {
      * @param v The annualized volatility.
      *
      */
-    function BSMOptionPrice(
+    function getOptionPremium(
         bool isCall,
         SD59x18 S,
         SD59x18 K,

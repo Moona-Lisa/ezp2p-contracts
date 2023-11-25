@@ -13,11 +13,17 @@ import {IBSM} from "../interfaces/IBSM.sol";
  */
 contract BSM is BSMStorage, IBSM {
     /*//////////////////////////////////////////////////////////////
+                                 CONSTRUCTOR
+    //////////////////////////////////////////////////////////////*/
+
+    constructor() {}
+
+    /*//////////////////////////////////////////////////////////////
                               PUBLIC VIEW
     //////////////////////////////////////////////////////////////*/
 
     /// @inheritdoc IBSM
-    function BSMOptionPrice(
+    function getOptionPremium(
         bool isCall,
         SD59x18 S,
         SD59x18 K,

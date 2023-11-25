@@ -1,9 +1,3 @@
-// We require the Hardhat Runtime Environment explicitly here. This is optional
-// but useful for running the script in a standalone fashion through `node <script>`.
-//
-// You can also run a script with `npx hardhat run <script>`. If you do that, Hardhat
-// will compile your contracts, add the Hardhat Runtime Environment's members to the
-// global scope, and execute the script.
 const hre = require("hardhat");
 require('dotenv').config();
 
@@ -12,8 +6,8 @@ async function main() {
 
   const Options = await ethers.getContractFactory("Options");
   const optionsInstance = await Options.deploy();
-
-  console.log("Options contract deployed to:", await optionsInstance.getAddress());
+  let deployAddr = await optionsInstance.getAddress()
+  console.log("Options contract deployed to:", deployAddr);
 
   let updaters = [process.env.UPDATER_ADDRESS1, process.env.UPDATER_ADDRESS2]
 
@@ -22,26 +16,28 @@ async function main() {
   await optionsInstance.setUpdater(updaters);
   await new Promise(r => setTimeout(r, 5000));
   await optionsInstance.addToken({
-    name: "chainlink", tokenAddress: "0x326C977E6efc84E512bB9C30f76E30c160eD06FB", isAllowed: true, symbol: "LINK", decimals: 18,
-    priceFeedAddress: "0x1C2252aeeD50e0c9B64bDfF2735Ee3C932F5C408", isStable: true
+    name: "chainlink", tokenAddress: "0x3A38c4d0444b5fFcc5323b2e86A21aBaaf5FbF26", isAllowed: true, symbol: "LINK", decimals: 18,
+    priceFeedAddress: "0x34C4c526902d88a3Aa98DB8a9b802603EB1E3470", isStable: false
   });
   await new Promise(r => setTimeout(r, 5000));
   await optionsInstance.addToken({
-    name: "Usdc", tokenAddress: "0xe6b8a5CF854791412c1f6EFC7CAf629f5Df1c747", isAllowed: true, symbol: "USDC", decimals: 18,
-    priceFeedAddress: "0x572dDec9087154dC5dfBB1546Bb62713147e0Ab0", isStable: false
+    name: "usdc", tokenAddress: "0xCaC7Ffa82c0f43EBB0FC11FCd32123EcA46626cf", isAllowed: true, symbol: "USDC", decimals: 6,
+    priceFeedAddress: "0x7898AcCC83587C3C55116c5230C17a6Cd9C71bad", isStable: true
   });
   await new Promise(r => setTimeout(r, 5000));
   await optionsInstance.addToken({
-    name: "bitcoin", tokenAddress: "0x0d787a4a1548f673ed375445535a6c7A1EE56180", isAllowed: true, symbol: "WBTC", decimals: 18,
-    priceFeedAddress: "0x007A22900a3B98143368Bd5906f8E17e9867581b", isStable: false
+    name: "bitcoin", tokenAddress: "0x0EFD8Ad2231c0B9C4d63F892E0a0a59a626Ce88d", isAllowed: true, symbol: "WBTC", decimals: 8,
+    priceFeedAddress: "0x31CF013A08c6Ac228C94551d535d5BAfE19c602a", isStable: false
   });
   await new Promise(r => setTimeout(r, 5000));
   await optionsInstance.addToken({
-    name: "ethereum", tokenAddress: "0xA6FA4fB5f76172d178d61B04b0ecd319C5d1C0aa", isAllowed: true, symbol: "WETH", decimals: 18,
-    priceFeedAddress: "0x0715A7794a1dc8e42615F059dD6e406A6594651A", isStable: false
+    name: "ethereum", tokenAddress: "0xf97b6C636167B529B6f1D729Bd9bC0e2Bd491848", isAllowed: true, symbol: "WETH", decimals: 18,
+    priceFeedAddress: "0x86d67c3D38D2bCeE722E601025C25a575021c6EA", isStable: false
   });
 
-  console.log("Token added successfully.");
+  await hre.run("verify:verify", {
+    address: deployAddr,
+  })
 }
 
 // We recommend this pattern to be able to use async/await everywhere

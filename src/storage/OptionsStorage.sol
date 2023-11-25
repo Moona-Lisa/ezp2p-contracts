@@ -8,9 +8,9 @@ abstract contract OptionsStorage {
         address creator;
         string symbol;
         uint256 endTime;
-        uint256 strikePrice;
-        uint256 totalAmount;
-        uint256 premiumPrice;
+        uint256 amount1;
+        uint256 amount2;
+        uint256 premium;
         address asset1;
         address asset2;
         bool isCall;

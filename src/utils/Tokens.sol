@@ -28,7 +28,7 @@ abstract contract Tokens is Auth, ITokens, TokensStorage, FunctionsConsumer {
         dataFeed = AggregatorV3Interface(params.priceFeedAddress);
 
         int price;
-        if (!params.isStable) {
+        if (params.isStable) {
             price = 100000000;
         } else {
             (, price, , , ) = dataFeed.latestRoundData();
@@ -43,7 +43,8 @@ abstract contract Tokens is Auth, ITokens, TokensStorage, FunctionsConsumer {
             uint256(price),
             0,
             params.priceFeedAddress,
-            params.isStable
+            params.isStable,
+            0
         );
 
         tokensArr.push(params.tokenAddress);
@@ -86,26 +87,6 @@ abstract contract Tokens is Auth, ITokens, TokensStorage, FunctionsConsumer {
 
             tokensMap[tokenAddress].currentPrice = uint256(price);
             emit Events.TokenPriceUpdated(tokenAddress, uint256(price));
-        }
-    }
-
-    /// @inheritdoc ITokens
-    function updateTokensVolatility() public onlyUpdater {
-        for (uint i = 0; i < tokensArr.length; i++) {
-            if (tokensMap[tokensArr[i]].isStable) {
-                continue;
-            }
-
-            address tokenAddress = tokensArr[i];
-
-            // Initialize a string array with size 1
-            string[] memory strigifiedAddr = new string[](1);
-
-            // Convert the address to a string and store it in the array
-            strigifiedAddr[0] = Utils.addr2str(tokenAddress);
-
-            // Send the request with the stringified address
-            sendRequest(786, strigifiedAddr);
         }
     }
 }

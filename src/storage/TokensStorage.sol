@@ -16,6 +16,7 @@ abstract contract TokensStorage {
         uint256 annualizedVolatility;
         address priceFeedAddress;
         bool isStable;
+        uint256 riskFreeRate;
     }
 
     mapping(address => Token) public tokensMap;

@@ -101,7 +101,7 @@ contract TokensTest is Test {
         DataTypes.CreateTokenParams memory testTokenLink = DataTypes
             .CreateTokenParams(
                 "chainlink",
-                address(0x326C977E6efc84E512bB9C30f76E30c160eD06FB),
+                address(0x0EFD8Ad2231c0B9C4d63F892E0a0a59a626Ce88d),
                 true,
                 "LINK",
                 18,
@@ -112,10 +112,9 @@ contract TokensTest is Test {
         options.addToken(testTokenLink);
 
         string
-            memory str = '[{"token":"0x326C977E6efc84E512bB9C30f76E30c160eD06FB","volatility":0.7115863873063887}]';
+            memory str = "0x0EFD8Ad2231c0B9C4d63F892E0a0a59a626Ce88d,42375422";
 
         bytes memory b = bytes(str);
         options.fulfillRequestMock(b);
-        options.updateTokensVolatilityMock();
     }
 }
