@@ -8,6 +8,10 @@ async function main() {
   const optionsInstance = await Options.deploy();
   let deployAddr = await optionsInstance.getAddress()
   console.log("Options contract deployed to:", deployAddr);
+  const CCIP = await ethers.getContractFactory("CCIPReceive");
+  const ccipInstance = await CCIP.deploy(deployAddr);
+  let deployAddr2 = await ccipInstance.getAddress()
+  console.log("CCIPReceive contract deployed to:", deployAddr2);
 
   let updaters = [process.env.UPDATER_ADDRESS1, process.env.UPDATER_ADDRESS2]
 
@@ -21,7 +25,7 @@ async function main() {
   });
   await new Promise(r => setTimeout(r, 5000));
   await optionsInstance.addToken({
-    name: "usdc", tokenAddress: "0xCaC7Ffa82c0f43EBB0FC11FCd32123EcA46626cf", isAllowed: true, symbol: "USDC", decimals: 6,
+    name: "usdc", tokenAddress: "0xD21341536c5cF5EB1bcb58f6723cE26e8D8E90e4", isAllowed: true, symbol: "USDC", decimals: 18,
     priceFeedAddress: "0x7898AcCC83587C3C55116c5230C17a6Cd9C71bad", isStable: true
   });
   await new Promise(r => setTimeout(r, 5000));
@@ -37,6 +41,12 @@ async function main() {
 
   await hre.run("verify:verify", {
     address: deployAddr,
+  })
+  await hre.run("verify:verify", {
+    address: deployAddr2,
+    constructorArguments: [
+      deployAddr
+    ]
   })
 }
 

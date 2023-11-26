@@ -6,6 +6,7 @@ import {MockOptions} from "./MockOptions.sol";
 import {DataTypes} from "../src/utils/DataTypes.sol";
 import {ERC20} from "../src/lib/ERC20.sol";
 import {MockERC20} from "./MockERC20.sol";
+import {Utils} from "../src/utils/Utils.sol";
 
 contract OptionsTest is Test {
     MockOptions public options;
@@ -292,5 +293,23 @@ contract OptionsTest is Test {
         vm.expectRevert("ALREADY CLAIMED");
         vm.prank(alice);
         options.claimCollateral(1);
+    }
+
+    function test_buyOptionCCIP() public {
+        optionSetup();
+
+        vm.warp(1620000000 + 10 hours);
+        tokenPayment.mint(address(options), 1e18);
+
+        string memory stt = "0x09937314c9dBd33c340f9735123A2c6586Fa1cdF6558";
+        string memory adr = Utils.substring(stt, 0, 42);
+        uint256 len = bytes(stt).length;
+        uint256 opt = Utils.str2num(Utils.substring(stt, 42, len));
+        address adr2 = Utils.str2addr(adr);
+
+        console2.log(adr2);
+        console2.log(opt);
+
+        options.buyOptionCCIP(1, bob, address(tokenPayment), 450);
     }
 }

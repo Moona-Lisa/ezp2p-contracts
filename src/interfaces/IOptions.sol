@@ -43,4 +43,26 @@ interface IOptions {
      * @param optionId The id of the option.
      */
     function buyOption(uint256 optionId) external;
+
+    /**
+     * @notice Buys an option using CCIP.
+     *
+     * @param optionId The id of the option.
+     * @param buyer The address of the buyer.
+     * @param tokenAddr The address of the token.
+     * @param amt The amount of the token.
+     */
+    function buyOptionCCIP(
+        uint256 optionId,
+        address buyer,
+        address tokenAddr,
+        uint256 amt
+    ) external;
+
+    /**
+     * @notice Claim the collateral of an option.
+     *
+     * @param optionId The id of the option.
+     */
+    function claimCollateral(uint256 optionId) external;
 }

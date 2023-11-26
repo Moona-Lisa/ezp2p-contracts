@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/Moona-Lisa/ezp2p-contracts#readme",
   "devDependencies": {
+    "@chainlink/contracts-ccip": "^0.7.6",
     "hardhat": "^2.19.0",
     "hardhat-preprocessor": "^0.1.5"
   },
