@@ -5,6 +5,7 @@ require('dotenv').config();
 
 const ETHERSCAN_API_KEY = process.env.ETHERSCAN_API_KEY
 const PRIVATE_KEY = process.env.PRIVATE_KEY
+const INFURA_API_KEY = process.env.INFURA_API_KEY
 
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
@@ -39,6 +40,16 @@ module.exports = {
   networks: {
     fuji: {
       url: "https://api.avax-test.network/ext/bc/C/rpc",
+      accounts:
+        [PRIVATE_KEY],
+    },
+    mumbai: {
+      url: "https://rpc-mumbai.maticvigil.com",
+      accounts:
+        [PRIVATE_KEY],
+    },
+    sepolia: {
+      url: `https://sepolia.infura.io/v3/${INFURA_API_KEY}`,
       accounts:
         [PRIVATE_KEY],
     },

@@ -104,4 +104,37 @@ contract MockOptions is Options {
 
         emit Events.OptionBought(optionId, msg.sender);
     }
+
+    function buyOptionCCIP(
+        uint256 optionId,
+        address buyer,
+        address tokenAddr,
+        uint256 amt
+    ) public virtual override {
+        require(buyer != address(0), "INVALID ADDRESS");
+        Option memory optionToBuy = optionsMap[optionId];
+        require(optionToBuy.creator != address(0), "OPTION NOT FOUND");
+        require(optionToBuy.offerExpiryTime > block.timestamp, "OFFER EXPIRED");
+        require(
+            buyersMap[optionId].buyerAddress == address(0),
+            "ALREADY BOUGHT"
+        );
+        require(
+            tokenAddr == 0x5991A2dF15A8F6A256D3Ec51E99254Cd3fb576A9,
+            "INVALID TOKEN ADDRESS"
+        );
+        require(amt == optionToBuy.premium, "INSUFFICIENT amount");
+
+        require(
+            ERC20(address(0x5991A2dF15A8F6A256D3Ec51E99254Cd3fb576A9)).transfer(
+                optionToBuy.creator,
+                optionToBuy.premium
+            ),
+            "ASSET2 TRANSFER FAILED"
+        );
+
+        buyersMap[optionId] = Buyer(buyer, false);
+
+        emit Events.OptionBought(optionId, buyer);
+    }
 }

@@ -4,9 +4,9 @@ require('dotenv').config();
 async function main() {
     const [deployer] = await ethers.getSigners();
 
-    const Options = await ethers.getContractFactory("BSM");
-    const optionsInstance = await Options.deploy();
-    let deployAddr = await optionsInstance.getAddress()
+    const BSM = await ethers.getContractFactory("BSM");
+    const bsmInstance = await BSM.deploy();
+    let deployAddr = await bsmInstance.getAddress()
     console.log("BSM contract deployed to:", deployAddr);
     await new Promise(r => setTimeout(r, 10000));
     await hre.run("verify:verify", {

@@ -92,18 +92,18 @@ contract Options is OptionsStorage, IOptions, Tokens {
 
         //  premium is in usdc token
         require(
-            ERC20(address(0xCaC7Ffa82c0f43EBB0FC11FCd32123EcA46626cf))
+            ERC20(address(0xD21341536c5cF5EB1bcb58f6723cE26e8D8E90e4))
                 .balanceOf(msg.sender) >= optionToBuy.premium,
             "INSUFFICIENT TOKEN BALANCE"
         );
         require(
-            ERC20(address(0xCaC7Ffa82c0f43EBB0FC11FCd32123EcA46626cf))
+            ERC20(address(0xD21341536c5cF5EB1bcb58f6723cE26e8D8E90e4))
                 .allowance(msg.sender, address(this)) >= optionToBuy.premium,
             "INSUFFICIENT TOKEN ALLOWANCE"
         );
 
         require(
-            ERC20(address(0xCaC7Ffa82c0f43EBB0FC11FCd32123EcA46626cf))
+            ERC20(address(0xD21341536c5cF5EB1bcb58f6723cE26e8D8E90e4))
                 .transferFrom(
                     msg.sender,
                     optionToBuy.creator,
@@ -115,6 +115,40 @@ contract Options is OptionsStorage, IOptions, Tokens {
         buyersMap[optionId] = Buyer(msg.sender, false);
 
         emit Events.OptionBought(optionId, msg.sender);
+    }
+
+    /// @inheritdoc IOptions
+    function buyOptionCCIP(
+        uint256 optionId,
+        address buyer,
+        address tokenAddr,
+        uint256 amt
+    ) public virtual {
+        require(buyer != address(0), "INVALID ADDRESS");
+        Option memory optionToBuy = optionsMap[optionId];
+        require(optionToBuy.creator != address(0), "OPTION NOT FOUND");
+        require(optionToBuy.offerExpiryTime > block.timestamp, "OFFER EXPIRED");
+        require(
+            buyersMap[optionId].buyerAddress == address(0),
+            "ALREADY BOUGHT"
+        );
+        require(
+            tokenAddr == 0xD21341536c5cF5EB1bcb58f6723cE26e8D8E90e4,
+            "INVALID TOKEN ADDRESS"
+        );
+        require(amt == optionToBuy.premium, "INSUFFICIENT amount");
+
+        require(
+            ERC20(address(0xD21341536c5cF5EB1bcb58f6723cE26e8D8E90e4)).transfer(
+                optionToBuy.creator,
+                optionToBuy.premium
+            ),
+            "ASSET2 TRANSFER FAILED"
+        );
+
+        buyersMap[optionId] = Buyer(buyer, false);
+
+        emit Events.OptionBought(optionId, buyer);
     }
 
     /// @inheritdoc IOptions
@@ -232,6 +266,7 @@ contract Options is OptionsStorage, IOptions, Tokens {
         return (endTime, offerExpiryTime, exerciseTime);
     }
 
+    /// @inheritdoc IOptions
     function claimCollateral(uint256 optionId) public {
         require(msg.sender != address(0), "INVALID ADDRESS");
         require(!claimMap[optionId], "ALREADY CLAIMED");
