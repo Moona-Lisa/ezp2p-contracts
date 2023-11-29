@@ -65,4 +65,9 @@ interface IOptions {
      * @param optionId The id of the option.
      */
     function claimCollateral(uint256 optionId) external;
+
+    /**
+     * @notice Auto claim the collateral of eligible options.
+     */
+    function autoClaimCollateral() external;
 }

@@ -200,6 +200,73 @@ contract Options is OptionsStorage, IOptions, Tokens {
         );
     }
 
+    /// @inheritdoc IOptions
+    function claimCollateral(uint256 optionId) public {
+        require(msg.sender != address(0), "INVALID ADDRESS");
+        require(!claimMap[optionId], "ALREADY CLAIMED");
+        Option memory optionToClaim = optionsMap[optionId];
+        require(optionToClaim.creator != address(0), "OPTION NOT FOUND");
+        require(
+            optionToClaim.offerExpiryTime < block.timestamp,
+            "OFFER NOT EXPIRED YET"
+        );
+
+        if (optionToClaim.endTime > block.timestamp) {
+            require(
+                buyersMap[optionId].buyerAddress == address(0),
+                "OPTION IS BOUGHT"
+            );
+        } else {
+            require(!buyersMap[optionId].hasExercised, "OPTION IS EXERCISED");
+        }
+
+        require(
+            ERC20(optionToClaim.asset1).transfer(
+                optionToClaim.creator,
+                optionToClaim.amount1
+            ),
+            "ASSET1 TRANSFER FAILED"
+        );
+        claimMap[optionId] = true;
+        emit Events.AssetClaimed(msg.sender, optionId, optionToClaim.amount1);
+    }
+
+    /// @inheritdoc IOptions
+    function autoClaimCollateral() public {
+        require(totalOptions > 0, "NO OPTIONS CREATED");
+        for (uint256 i = 1; i <= totalOptions; i++) {
+            Option memory optionToClaim = optionsMap[i];
+            if (
+                optionToClaim.creator != address(0) &&
+                !claimMap[i] &&
+                optionToClaim.offerExpiryTime < block.timestamp
+            ) {
+                if (
+                    optionToClaim.endTime > block.timestamp &&
+                    buyersMap[i].buyerAddress == address(0)
+                ) {
+                    require(
+                        ERC20(optionToClaim.asset1).transfer(
+                            optionToClaim.creator,
+                            optionToClaim.amount1
+                        ),
+                        "ASSET1 TRANSFER FAILED"
+                    );
+                    claimMap[i] = true;
+                } else if (!buyersMap[i].hasExercised) {
+                    require(
+                        ERC20(optionToClaim.asset1).transfer(
+                            optionToClaim.creator,
+                            optionToClaim.amount1
+                        ),
+                        "ASSET1 TRANSFER FAILED"
+                    );
+                    claimMap[i] = true;
+                }
+            }
+        }
+    }
+
     /*//////////////////////////////////////////////////////////////
                               PUBLIC VIEW
     //////////////////////////////////////////////////////////////*/
@@ -221,8 +288,8 @@ contract Options is OptionsStorage, IOptions, Tokens {
         require(params.amount1 > 0, "AMOUNT1 MUST BE POSITIVE");
         require(params.amount2 > 0, "AMOUNT2 MUST BE POSITIVE");
         require(
-            params.totalDurationInDays > 3,
-            "DURATION MUST BE MORE THAN 3 DAYS"
+            params.totalDurationInDays >= 3,
+            "DURATION MUST BE AT LEAST 3 DAYS"
         );
         require(
             params.offerTimeInHours > 0,
@@ -264,36 +331,5 @@ contract Options is OptionsStorage, IOptions, Tokens {
         );
 
         return (endTime, offerExpiryTime, exerciseTime);
-    }
-
-    /// @inheritdoc IOptions
-    function claimCollateral(uint256 optionId) public {
-        require(msg.sender != address(0), "INVALID ADDRESS");
-        require(!claimMap[optionId], "ALREADY CLAIMED");
-        Option memory optionToClaim = optionsMap[optionId];
-        require(optionToClaim.creator != address(0), "OPTION NOT FOUND");
-        require(
-            optionToClaim.offerExpiryTime < block.timestamp,
-            "OFFER NOT EXPIRED YET"
-        );
-
-        if (optionToClaim.endTime > block.timestamp) {
-            require(
-                buyersMap[optionId].buyerAddress == address(0),
-                "OPTION IS BOUGHT"
-            );
-        } else {
-            require(!buyersMap[optionId].hasExercised, "OPTION IS EXERCISED");
-        }
-
-        require(
-            ERC20(optionToClaim.asset1).transfer(
-                optionToClaim.creator,
-                optionToClaim.amount1
-            ),
-            "ASSET1 TRANSFER FAILED"
-        );
-        claimMap[optionId] = true;
-        emit Events.AssetClaimed(msg.sender, optionId, optionToClaim.amount1);
     }
 }

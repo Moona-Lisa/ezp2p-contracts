@@ -67,4 +67,12 @@ contract CCIPReceive is CCIPReceiver, Auth {
 
         options.buyOptionCCIP(optionId, sender, tokenaddr, amt);
     }
+
+    function updateOptionsAddr(address optionsAddr) public onlyOwner {
+        options = IOptions(optionsAddr);
+    }
+
+    function getOptionsAddr() public view returns (address) {
+        return address(options);
+    }
 }

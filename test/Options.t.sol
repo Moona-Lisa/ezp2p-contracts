@@ -102,7 +102,7 @@ contract OptionsTest is Test {
         options.createOption(optionParams);
 
         optionParams.amount1 = 5000;
-        vm.expectRevert("DURATION MUST BE MORE THAN 3 DAYS");
+        vm.expectRevert("DURATION MUST BE AT LEAST 3 DAYS");
         vm.prank(alice);
         options.createOption(optionParams);
 
