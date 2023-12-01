@@ -238,7 +238,7 @@ contract Options is OptionsStorage, IOptions, Tokens {
             Option memory optionToClaim = optionsMap[i];
             if (
                 optionToClaim.creator != address(0) &&
-                !claimMap[i] &&
+                claimMap[i] == false &&
                 optionToClaim.offerExpiryTime < block.timestamp
             ) {
                 if (
@@ -253,7 +253,15 @@ contract Options is OptionsStorage, IOptions, Tokens {
                         "ASSET1 TRANSFER FAILED"
                     );
                     claimMap[i] = true;
-                } else if (!buyersMap[i].hasExercised) {
+                    emit Events.AssetClaimed(
+                        msg.sender,
+                        i,
+                        optionToClaim.amount1
+                    );
+                } else if (
+                    optionToClaim.endTime < block.timestamp &&
+                    buyersMap[i].hasExercised == false
+                ) {
                     require(
                         ERC20(optionToClaim.asset1).transfer(
                             optionToClaim.creator,
@@ -262,6 +270,11 @@ contract Options is OptionsStorage, IOptions, Tokens {
                         "ASSET1 TRANSFER FAILED"
                     );
                     claimMap[i] = true;
+                    emit Events.AssetClaimed(
+                        msg.sender,
+                        i,
+                        optionToClaim.amount1
+                    );
                 }
             }
         }
