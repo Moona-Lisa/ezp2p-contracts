@@ -92,11 +92,15 @@ contract MockOptions is Options {
 
         require(
             ERC20(address(0x5991A2dF15A8F6A256D3Ec51E99254Cd3fb576A9))
-                .transferFrom(
-                    msg.sender,
-                    optionToBuy.creator,
-                    optionToBuy.premium
-                ),
+                .transferFrom(msg.sender, address(this), optionToBuy.premium),
+            "ASSET2 TRANSFER FAILED"
+        );
+        uint256 amoutWithoutFee = (optionToBuy.premium * 99) / 100; // 1% fee to the contract
+        require(
+            ERC20(address(0x5991A2dF15A8F6A256D3Ec51E99254Cd3fb576A9)).transfer(
+                optionToBuy.creator,
+                amoutWithoutFee
+            ),
             "ASSET2 TRANSFER FAILED"
         );
 
@@ -125,10 +129,11 @@ contract MockOptions is Options {
         );
         require(amt == optionToBuy.premium, "INSUFFICIENT amount");
 
+        uint256 amoutWithoutFee = (optionToBuy.premium * 99) / 100; // 1% fee to the contract
         require(
             ERC20(address(0x5991A2dF15A8F6A256D3Ec51E99254Cd3fb576A9)).transfer(
                 optionToBuy.creator,
-                optionToBuy.premium
+                amoutWithoutFee
             ),
             "ASSET2 TRANSFER FAILED"
         );

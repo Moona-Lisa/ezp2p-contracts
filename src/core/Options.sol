@@ -104,11 +104,15 @@ contract Options is OptionsStorage, IOptions, Tokens {
 
         require(
             ERC20(address(0xD21341536c5cF5EB1bcb58f6723cE26e8D8E90e4))
-                .transferFrom(
-                    msg.sender,
-                    optionToBuy.creator,
-                    optionToBuy.premium
-                ),
+                .transferFrom(msg.sender, address(this), optionToBuy.premium),
+            "ASSET2 TRANSFER FAILED"
+        );
+        uint256 amoutWithoutFee = (optionToBuy.premium * 99) / 100; // 1% fee to the contract
+        require(
+            ERC20(address(0xD21341536c5cF5EB1bcb58f6723cE26e8D8E90e4)).transfer(
+                optionToBuy.creator,
+                amoutWithoutFee
+            ),
             "ASSET2 TRANSFER FAILED"
         );
 
@@ -138,10 +142,11 @@ contract Options is OptionsStorage, IOptions, Tokens {
         );
         require(amt == optionToBuy.premium, "INSUFFICIENT amount");
 
+        uint256 amoutWithoutFee = (optionToBuy.premium * 99) / 100; // 1% fee to the contract
         require(
             ERC20(address(0xD21341536c5cF5EB1bcb58f6723cE26e8D8E90e4)).transfer(
                 optionToBuy.creator,
-                optionToBuy.premium
+                amoutWithoutFee
             ),
             "ASSET2 TRANSFER FAILED"
         );
